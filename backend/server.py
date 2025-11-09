@@ -545,8 +545,16 @@ async def get_child_dashboard(child_id: str, current_user: User = Depends(get_cu
 
 @api_router.post("/medications")
 async def add_medication(request: AddMedicationRequest, current_user: User = Depends(get_current_user)):
+    child_name = None
+    if request.child_id:
+        child = await db.children.find_one({"id": request.child_id, "parent_id": current_user.id})
+        if child:
+            child_name = f"{child['first_name']} {child['last_name']}"
+    
     medication = Medication(
         user_id=current_user.id,
+        child_id=request.child_id,
+        child_name=child_name,
         name=request.name,
         dosage=request.dosage,
         frequency=request.frequency,
