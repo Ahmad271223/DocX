@@ -218,14 +218,14 @@ const DateSchedule = ({ children = [], selectedChild = null }) => {
               <div>
                 <Label>Für wen? (optional)</Label>
                 <Select
-                  value={formData.child_id}
-                  onValueChange={(value) => setFormData({ ...formData, child_id: value })}
+                  value={formData.child_id || "self"}
+                  onValueChange={(value) => setFormData({ ...formData, child_id: value === "self" ? "" : value })}
                 >
                   <SelectTrigger data-testid="schedule-child-select">
                     <SelectValue placeholder="Für mich selbst" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Für mich selbst</SelectItem>
+                    <SelectItem value="self">Für mich selbst</SelectItem>
                     {children.map(child => (
                       <SelectItem key={child.id} value={child.id}>
                         {child.first_name} {child.last_name}
