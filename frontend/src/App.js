@@ -65,6 +65,11 @@ function App() {
           <Route path="/child/:childId" element={token ? <ChildDashboardPage /> : <Navigate to="/login" />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancel" element={<PaymentCancelPage />} />
+          
+          {/* Doctor Routes */}
+          <Route path="/doctor-register" element={token && user?.user_type === "doctor" ? <Navigate to="/doctor-dashboard" /> : <DoctorRegisterPage />} />
+          <Route path="/doctor-login" element={token && user?.user_type === "doctor" ? <Navigate to="/doctor-dashboard" /> : <DoctorLoginPage />} />
+          <Route path="/doctor-dashboard" element={token && user?.user_type === "doctor" ? <DoctorDashboardPage /> : <Navigate to="/doctor-login" />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
