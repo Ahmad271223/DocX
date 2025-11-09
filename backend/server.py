@@ -1605,7 +1605,7 @@ async def get_prescription_warnings(current_user: User = Depends(get_current_use
                 parts = medication["frequency"].lower().split("x")
                 if len(parts) > 1:
                     daily_usage = int(parts[0].strip())
-            except:
+            except (ValueError, IndexError):
                 daily_usage = 1
         
         days_until_empty = medication["stock"] / daily_usage if daily_usage > 0 else medication["stock"]
