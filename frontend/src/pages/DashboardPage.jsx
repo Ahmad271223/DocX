@@ -66,16 +66,40 @@ const DashboardPage = () => {
     toast.success("Erfolgreich abgemeldet");
   };
 
-  const handleDeleteMedication = async (medicationId) => {
-    if (!window.confirm("Möchten Sie dieses Medikament wirklich löschen?")) {
+  const toggleDeleteMode = () => {
+    setDeleteMode(!deleteMode);
+    setSelectedMedications([]);
+  };
+
+  const toggleMedicationSelection = (medicationId) => {
+    if (selectedMedications.includes(medicationId)) {
+      setSelectedMedications(selectedMedications.filter(id => id !== medicationId));
+    } else {
+      setSelectedMedications([...selectedMedications, medicationId]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedMedications.length === 0) {
+      toast.error("Keine Medikamente ausgewählt");
+      return;
+    }
+
+    if (!window.confirm(`Möchten Sie ${selectedMedications.length} Medikament(e) wirklich löschen?`)) {
       return;
     }
 
     try {
-      await axios.delete(`${API}/medications/${medicationId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      toast.success("Medikament gelöscht!");
+      await Promise.all(
+        selectedMedications.map(id =>
+          axios.delete(`${API}/medications/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        )
+      );
+      toast.success("Medikamente gelöscht!");
+      setSelectedMedications([]);
+      setDeleteMode(false);
       fetchData();
     } catch (error) {
       toast.error("Fehler beim Löschen");
