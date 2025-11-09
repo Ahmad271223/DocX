@@ -14,6 +14,7 @@ import AddVitalSignsModal from "@/components/AddVitalSignsModal";
 import TakeMedicationButton from "@/components/TakeMedicationButton";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
 import YearlyCalendar from "@/components/YearlyCalendar";
+import EmergencyAddresses from "@/components/EmergencyAddresses";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
