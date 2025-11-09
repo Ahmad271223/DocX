@@ -313,6 +313,39 @@ class AddRecurringScheduleRequest(BaseModel):
     description: Optional[str] = None
     child_id: Optional[str] = None
 
+class CreateDoctorProfileRequest(BaseModel):
+    specialty: str
+    license_number: str
+    address: str
+    city: str
+    postal_code: str
+    phone: str
+    bio: Optional[str] = None
+    years_of_experience: Optional[int] = None
+    languages: List[str] = []
+
+class UpdateDoctorProfileRequest(BaseModel):
+    specialty: Optional[str] = None
+    license_number: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    postal_code: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    years_of_experience: Optional[int] = None
+    languages: Optional[List[str]] = None
+
+class AddDoctorAvailabilityRequest(BaseModel):
+    day_of_week: int
+    start_time: str
+    end_time: str
+    slot_duration: int = 30
+
+class AddDoctorVacationRequest(BaseModel):
+    start_date: str
+    end_date: str
+    reason: Optional[str] = None
+
 # ============== HELPER FUNCTIONS ==============
 
 def hash_password(password: str) -> str:
