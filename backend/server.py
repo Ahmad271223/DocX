@@ -551,6 +551,17 @@ async def update_medication_stock(medication_id: str, stock: int, current_user: 
     
     return {"message": "Stock updated successfully"}
 
+@api_router.delete("/medications/{medication_id}")
+async def delete_medication(medication_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.medications.delete_one(
+        {"id": medication_id, "user_id": current_user.id}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Medication not found")
+    
+    return {"message": "Medication deleted successfully"}
+
 @api_router.post("/medications/{medication_id}/take")
 async def take_medication(medication_id: str, current_user: User = Depends(get_current_user)):
     # Get medication
