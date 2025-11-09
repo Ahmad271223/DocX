@@ -467,22 +467,4 @@ const VitalSignCard = ({ vital }) => {
   );
 };
 
-const PharmacyCard = ({ pharmacy }) => {
-  return (
-    <div className="bg-gradient-to-r from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-bold text-gray-800 mb-1">{pharmacy.name}</h3>
-          <p className="text-sm text-gray-600">{pharmacy.address}</p>
-          <p className="text-sm text-gray-600">{pharmacy.postal_code} {pharmacy.city}</p>
-          <p className="text-sm text-gray-600 mt-2">{pharmacy.phone}</p>
-        </div>
-        <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">
-          {pharmacy.distance}
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export default DashboardPage;
