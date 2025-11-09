@@ -183,14 +183,35 @@ const DashboardPage = () => {
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Meine Medikamente</h2>
-                <Button
-                  data-testid="add-medication-btn"
-                  onClick={() => setShowMedicationModal(true)}
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full"
-                >
-                  <Plus className="w-4 h-4" />
-                  Medikament hinzufügen
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    data-testid="toggle-delete-mode-btn"
+                    onClick={toggleDeleteMode}
+                    variant={deleteMode ? "destructive" : "outline"}
+                    className="flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {deleteMode ? "Abbrechen" : "Löschen"}
+                  </Button>
+                  {deleteMode && selectedMedications.length > 0 && (
+                    <Button
+                      data-testid="delete-selected-btn"
+                      onClick={handleDeleteSelected}
+                      className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                    >
+                      {selectedMedications.length} löschen
+                    </Button>
+                  )}
+                  <Button
+                    data-testid="add-medication-btn"
+                    onClick={() => setShowMedicationModal(true)}
+                    disabled={deleteMode}
+                    className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full disabled:opacity-50"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Medikament hinzufügen
+                  </Button>
+                </div>
               </div>
               
               {medications.length === 0 ? (
