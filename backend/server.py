@@ -516,9 +516,13 @@ async def add_medication(request: AddMedicationRequest, current_user: User = Dep
         name=request.name,
         dosage=request.dosage,
         frequency=request.frequency,
+        frequency_times=request.frequency_times,
         stock=request.stock,
         expiry_date=request.expiry_date,
-        prescription_number=request.prescription_number
+        prescription_number=request.prescription_number,
+        barcode=request.barcode,
+        prescription_image=request.prescription_image,
+        reminder_enabled=request.reminder_enabled
     )
     
     medication_dict = medication.model_dump()
