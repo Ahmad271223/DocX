@@ -272,7 +272,7 @@ const ChildDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="schedule" data-testid="child-schedule-content">
-            <DateSchedule selectedChild={childId} />
+            <YearlyCalendar selectedChild={childId} />
           </TabsContent>
         </Tabs>
       </div>
