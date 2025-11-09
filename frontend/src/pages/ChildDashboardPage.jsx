@@ -215,39 +215,7 @@ const ChildDashboardPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="appointments" data-testid="child-appointments-content">
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Termine</h2>
-                <Button
-                  data-testid="child-add-appointment-btn"
-                  onClick={() => setShowAppointmentModal(true)}
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full"
-                >
-                  <Plus className="w-4 h-4" />
-                  Termin hinzufügen
-                </Button>
-              </div>
-              
-              {appointments.length === 0 ? (
-                <div className="text-center py-12">
-                  <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Noch keine Termine eingetragen</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {appointments.map(apt => (
-                    <div key={apt.id} className="bg-gradient-to-r from-white to-teal-50 border border-teal-100 rounded-xl p-4">
-                      <p className="font-bold text-gray-800">{apt.appointment_date}</p>
-                      <p className="text-sm text-gray-600">{apt.appointment_time}</p>
-                      {apt.notes && <p className="text-sm text-gray-500 mt-2">{apt.notes}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </TabsContent>
-
+ 
           <TabsContent value="vitals" data-testid="child-vitals-content">
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
