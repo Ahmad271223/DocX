@@ -136,6 +136,25 @@ class PaymentTransaction(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class MedicationIntake(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    medication_id: str
+    taken_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class WeeklyScheduleEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    day_of_week: int  # 0=Monday, 6=Sunday
+    start_time: str  # HH:MM format
+    end_time: str  # HH:MM format
+    title: str
+    description: Optional[str] = None
+    color: str = "#14b8a6"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============== REQUEST MODELS ==============
 
 class RegisterRequest(BaseModel):
