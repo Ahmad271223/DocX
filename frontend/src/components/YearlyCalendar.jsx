@@ -124,9 +124,21 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
       ...formData,
       date: date,
       time: `${String(hour).padStart(2, '0')}:00`,
-      child_id: selectedChild || ''
+      child_id: selectedChild || '',
+      recurrence: 'once',
+      recurrence_count: 1
     });
     setShowAddModal(true);
+  };
+
+  const handleQuickDateSelect = (event) => {
+    const selectedDate = event.target.value;
+    if (selectedDate) {
+      setFormData({
+        ...formData,
+        date: selectedDate
+      });
+    }
   };
 
   const getWeekDays = (weekIndex) => {
