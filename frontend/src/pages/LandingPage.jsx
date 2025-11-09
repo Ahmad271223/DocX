@@ -163,12 +163,29 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Heart className="w-6 h-6" fill="currentColor" />
-            <span className="text-xl font-bold">HealthLink</span>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Heart className="w-6 h-6" fill="currentColor" />
+              <span className="text-xl font-bold">HealthLink</span>
+            </div>
+            <p className="text-teal-100 mb-6">© 2025 HealthLink. Alle Rechte vorbehalten.</p>
           </div>
-          <p className="text-teal-100">© 2025 HealthLink. Alle Rechte vorbehalten.</p>
+          
+          {/* Arzt-Link im Footer */}
+          <div className="border-t border-teal-400/30 pt-8 text-center">
+            <div className="inline-flex flex-col sm:flex-row gap-4 items-center">
+              <span className="text-teal-50 font-medium">Sind Sie Arzt oder betreiben Sie eine Praxis?</span>
+              <Button
+                data-testid="footer-doctor-register-btn"
+                onClick={() => navigate("/doctor-register")}
+                variant="outline"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 px-6 py-2 rounded-full transition-all duration-300 backdrop-blur-sm"
+              >
+                Als Arztpraxis registrieren / anmelden
+              </Button>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
