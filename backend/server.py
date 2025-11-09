@@ -164,6 +164,21 @@ class WeeklyScheduleEntry(BaseModel):
     color: str = "#14b8a6"  # Auto-set based on category
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class RecurringScheduleEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    child_id: Optional[str] = None
+    child_name: Optional[str] = None
+    day_of_week: int  # 0=Monday, 6=Sunday
+    start_hour: int  # 0-23
+    end_hour: int  # 0-23
+    title: str
+    category: str = "other"
+    description: Optional[str] = None
+    color: str = "#14b8a6"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============== REQUEST MODELS ==============
 
 class RegisterRequest(BaseModel):
