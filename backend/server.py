@@ -182,9 +182,13 @@ class AddMedicationRequest(BaseModel):
     name: str
     dosage: str
     frequency: str
+    frequency_times: List[str] = []
     stock: int
     expiry_date: str
     prescription_number: Optional[str] = None
+    barcode: Optional[str] = None
+    prescription_image: Optional[str] = None
+    reminder_enabled: bool = True
 
 class AddAppointmentRequest(BaseModel):
     doctor_id: str
