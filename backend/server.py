@@ -511,6 +511,27 @@ async def get_children(current_user: User = Depends(get_current_user)):
         "can_add_more": len(children) < current_user.max_children
     }
 
+@api_router.get("/children/{child_id}/dashboard")
+async def get_child_dashboard(child_id: str, current_user: User = Depends(get_current_user)):
+    # Verify child belongs to parent
+    child = await db.children.find_one({"id": child_id, "parent_id": current_user.id}, {"_id": 0})
+    if not child:
+        raise HTTPException(status_code=404, detail="Child not found")
+    
+    # Get child's data
+    medications = await db.medications.find({"user_id": current_user.id, "child_id": child_id}, {"_id": 0}).to_list(100)
+    appointments = await db.appointments.find({"user_id": current_user.id, "child_id": child_id}, {"_id": 0}).to_list(100)
+    vital_signs = await db.vital_signs.find({"user_id": current_user.id, "child_id": child_id}, {"_id": 0}).sort("recorded_at", -1).to_list(50)
+    schedule = await db.weekly_schedule.find({"user_id": current_user.id, "child_id": child_id}, {"_id": 0}).to_list(500)
+    
+    return {
+        "child": child,
+        "medications": medications,
+        "appointments": appointments,
+        "vital_signs": vital_signs,
+        "schedule": schedule
+    }
+
 # ============== MEDICATION ENDPOINTS ==============
 
 @api_router.post("/medications")
