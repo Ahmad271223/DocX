@@ -27,6 +27,7 @@ const DashboardPage = () => {
   const [showChildModal, setShowChildModal] = useState(false);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
+  const [childrenData, setChildrenData] = useState({ children: [], max_children: 0, can_add_more: true });
 
   useEffect(() => {
     fetchData();
@@ -45,6 +46,7 @@ const DashboardPage = () => {
       ]);
 
       setMedications(medsRes.data.medications);
+      setChildrenData(childrenRes.data);
       setChildren(childrenRes.data.children);
       setAppointments(appointmentsRes.data.appointments);
       setVitalSigns(vitalRes.data.vital_signs);
