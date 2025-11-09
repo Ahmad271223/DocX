@@ -296,23 +296,8 @@ const DashboardPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="pharmacies" data-testid="pharmacies-content">
-            <Card className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Apotheken in Ihrer Nähe</h2>
-              
-              {pharmacies.length === 0 ? (
-                <div className="text-center py-12">
-                  <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Keine Apotheken gefunden</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {pharmacies.map(pharmacy => (
-                    <PharmacyCard key={pharmacy.id} pharmacy={pharmacy} />
-                  ))}
-                </div>
-              )}
-            </Card>
+          <TabsContent value="emergency" data-testid="emergency-content">
+            <EmergencyAddresses />
           </TabsContent>
 
           <TabsContent value="calendar" data-testid="calendar-content">
