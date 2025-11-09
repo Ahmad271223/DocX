@@ -205,6 +205,7 @@ class AddAppointmentRequest(BaseModel):
     appointment_date: str
     appointment_time: str
     notes: Optional[str] = None
+    child_id: Optional[str] = None
 
 class AddVitalSignsRequest(BaseModel):
     pulse: Optional[int] = None
