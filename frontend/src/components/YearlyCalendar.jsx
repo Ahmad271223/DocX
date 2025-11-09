@@ -472,6 +472,49 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
               />
             </div>
             
+            <div className="border-t pt-4">
+              <Label htmlFor="recurrence">Wiederholung</Label>
+              <Select
+                value={formData.recurrence}
+                onValueChange={(value) => setFormData({ ...formData, recurrence: value, recurrence_count: value === 'once' ? 1 : 4 })}
+              >
+                <SelectTrigger data-testid="calendar-recurrence-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="once">Einmalig</SelectItem>
+                  <SelectItem value="weekly-2">Alle 2 Wochen</SelectItem>
+                  <SelectItem value="weekly-4">Alle 4 Wochen</SelectItem>
+                  <SelectItem value="forever">Für immer (1 Jahr)</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              {(formData.recurrence === 'weekly-2' || formData.recurrence === 'weekly-4') && (
+                <div className="mt-3">
+                  <Label htmlFor="recurrence_count">Wie oft wiederholen?</Label>
+                  <Input
+                    id="recurrence_count"
+                    type="number"
+                    min="1"
+                    max="52"
+                    data-testid="calendar-recurrence-count-input"
+                    value={formData.recurrence_count}
+                    onChange={(e) => setFormData({ ...formData, recurrence_count: parseInt(e.target.value) || 1 })}
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Erstellt {formData.recurrence_count} Termine
+                  </p>
+                </div>
+              )}
+              
+              {formData.recurrence === 'forever' && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Erstellt 52 Termine (wöchentlich für 1 Jahr)
+                </p>
+              )}
+            </div>
+            
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
