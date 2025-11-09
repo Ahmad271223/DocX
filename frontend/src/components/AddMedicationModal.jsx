@@ -33,6 +33,41 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAddTime = () => {
+    if (!formData.frequency_times.includes(newTime)) {
+      setFormData({
+        ...formData,
+        frequency_times: [...formData.frequency_times, newTime].sort()
+      });
+      setNewTime("08:00");
+    }
+  };
+
+  const handleRemoveTime = (time) => {
+    setFormData({
+      ...formData,
+      frequency_times: formData.frequency_times.filter(t => t !== time)
+    });
+  };
+
+  const handlePrescriptionData = (data) => {
+    setFormData({
+      ...formData,
+      name: data.medication_name || formData.name,
+      dosage: data.dosage || formData.dosage,
+      prescription_number: data.prescription_number || formData.prescription_number
+    });
+  };
+
+  const handleBarcodeData = (data) => {
+    setFormData({
+      ...formData,
+      name: data.name || formData.name,
+      dosage: data.dosage || formData.dosage,
+      barcode: data.barcode || formData.barcode
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -53,9 +88,12 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
         name: "",
         dosage: "",
         frequency: "",
+        frequency_times: [],
         stock: "",
         expiry_date: "",
-        prescription_number: ""
+        prescription_number: "",
+        barcode: "",
+        reminder_enabled: true
       });
       onSuccess();
       onClose();
