@@ -237,7 +237,20 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
           <h2 className="text-2xl font-bold text-gray-800">Kalender</h2>
           <p className="text-gray-600">KW {weekNumber} - {weekStart} bis {weekEnd}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <Input
+            type="date"
+            onChange={(e) => {
+              const selectedDate = new Date(e.target.value);
+              const startOfYear = new Date(selectedDate.getFullYear(), 0, 1);
+              const daysSinceStart = Math.floor((selectedDate - startOfYear) / (24 * 60 * 60 * 1000));
+              const weekIndex = Math.floor(daysSinceStart / 7);
+              setCurrentWeek(Math.min(52, Math.max(0, weekIndex)));
+            }}
+            className="w-48"
+            data-testid="calendar-date-picker"
+            placeholder="Datum auswählen"
+          />
           <Button
             onClick={() => setCurrentWeek(Math.max(0, currentWeek - 1))}
             disabled={currentWeek === 0}
@@ -245,7 +258,7 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
             data-testid="prev-week-btn"
           >
             <ChevronLeft className="w-4 h-4" />
-            Vorherige Woche
+            Vorherige
           </Button>
           <Button
             onClick={() => setCurrentWeek(Math.min(52, currentWeek + 1))}
@@ -253,8 +266,16 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
             variant="outline"
             data-testid="next-week-btn"
           >
-            Nächste Woche
+            Nächste
             <ChevronRight className="w-4 h-4" />
+          </Button>
+          <Button
+            onClick={() => setShowAddModal(true)}
+            data-testid="quick-add-btn"
+            className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full"
+          >
+            <Plus className="w-4 h-4" />
+            Termin
           </Button>
         </div>
       </div>
