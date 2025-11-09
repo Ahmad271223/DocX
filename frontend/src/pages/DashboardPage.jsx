@@ -263,6 +263,10 @@ const DashboardPage = () => {
               )}
             </Card>
           </TabsContent>
+
+          <TabsContent value="schedule" data-testid="schedule-content">
+            <WeeklySchedule />
+          </TabsContent>
         </Tabs>
       </div>
 
