@@ -286,7 +286,8 @@ async def register(request: RegisterRequest):
         postal_code=request.postal_code,
         email=request.email,
         password_hash=hash_password(request.password),
-        subscription_amount=subscription_amount
+        subscription_amount=subscription_amount,
+        max_children=request.num_children  # Store max allowed children
     )
     
     user_dict = user.model_dump()
