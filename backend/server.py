@@ -721,6 +721,74 @@ async def get_vital_signs(current_user: User = Depends(get_current_user)):
     ).sort("recorded_at", -1).to_list(50)
     return {"vital_signs": vital_signs}
 
+# ============== WEEKLY SCHEDULE ENDPOINTS ==============
+
+@api_router.post("/schedule")
+async def add_schedule_entry(request: AddScheduleEntryRequest, current_user: User = Depends(get_current_user)):
+    entry = WeeklyScheduleEntry(
+        user_id=current_user.id,
+        day_of_week=request.day_of_week,
+        start_time=request.start_time,
+        end_time=request.end_time,
+        title=request.title,
+        description=request.description,
+        color=request.color
+    )
+    
+    entry_dict = entry.model_dump()
+    await db.weekly_schedule.insert_one(entry_dict)
+    
+    return {"message": "Schedule entry added successfully", "entry": entry}
+
+@api_router.get("/schedule")
+async def get_schedule(current_user: User = Depends(get_current_user)):
+    schedule = await db.weekly_schedule.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(500)
+    
+    # Organize by day of week
+    organized = {i: [] for i in range(7)}
+    for entry in schedule:
+        day = entry["day_of_week"]
+        organized[day].append(entry)
+    
+    return {"schedule": organized}
+
+@api_router.delete("/schedule/{entry_id}")
+async def delete_schedule_entry(entry_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.weekly_schedule.delete_one(
+        {"id": entry_id, "user_id": current_user.id}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Schedule entry not found")
+    
+    return {"message": "Schedule entry deleted successfully"}
+
+@api_router.put("/schedule/{entry_id}")
+async def update_schedule_entry(
+    entry_id: str,
+    request: AddScheduleEntryRequest,
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.weekly_schedule.update_one(
+        {"id": entry_id, "user_id": current_user.id},
+        {"$set": {
+            "day_of_week": request.day_of_week,
+            "start_time": request.start_time,
+            "end_time": request.end_time,
+            "title": request.title,
+            "description": request.description,
+            "color": request.color
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Schedule entry not found")
+    
+    return {"message": "Schedule entry updated successfully"}
+
 app.include_router(api_router)
 
 app.add_middleware(
