@@ -313,7 +313,7 @@ const DashboardPage = () => {
   );
 };
 
-const MedicationCard = ({ medication, onTaken }) => {
+const MedicationCard = ({ medication, onTaken, onDelete }) => {
   const getStockColor = (stock) => {
     if (stock <= 1) return "text-red-600";
     if (stock <= 3) return "text-orange-600";
@@ -331,11 +331,24 @@ const MedicationCard = ({ medication, onTaken }) => {
   const warning = getStockWarning(medication.stock);
 
   return (
-    <div className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-2">
+    <div className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow relative group">
+      <button
+        onClick={() => onDelete(medication.id)}
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-opacity"
+        data-testid={`delete-medication-${medication.id}`}
+        title="Medikament löschen"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+      
+      <div className="flex justify-between items-start mb-2 pr-10">
         <h3 className="font-bold text-gray-800">{medication.name}</h3>
         <TakeMedicationButton medication={medication} onSuccess={onTaken} />
       </div>
+      
+      {medication.child_name && (
+        <p className="text-sm text-teal-600 font-semibold mb-1">\ud83d\udc64 {medication.child_name}</p>
+      )}
       
       <p className="text-sm text-gray-600 mb-1">Dosierung: {medication.dosage}</p>
       <p className="text-sm text-gray-600 mb-1">Häufigkeit: {medication.frequency}</p>
