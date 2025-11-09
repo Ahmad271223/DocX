@@ -381,7 +381,7 @@ const DashboardPage = () => {
   );
 };
 
-const MedicationCard = ({ medication, onTaken, onDelete }) => {
+const MedicationCard = ({ medication, onTaken, deleteMode, isSelected, onToggleSelect }) => {
   const getStockColor = (stock) => {
     if (stock <= 1) return "text-red-600";
     if (stock <= 3) return "text-orange-600";
@@ -398,20 +398,35 @@ const MedicationCard = ({ medication, onTaken, onDelete }) => {
 
   const warning = getStockWarning(medication.stock);
 
+  const handleClick = () => {
+    if (deleteMode) {
+      onToggleSelect(medication.id);
+    }
+  };
+
   return (
-    <div className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow relative group">
-      <button
-        onClick={() => onDelete(medication.id)}
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-opacity"
-        data-testid={`delete-medication-${medication.id}`}
-        title="Medikament löschen"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+    <div 
+      onClick={handleClick}
+      className={`bg-gradient-to-br from-white to-teal-50 border rounded-xl p-4 hover:shadow-lg transition-all relative ${
+        deleteMode ? 'cursor-pointer' : ''
+      } ${
+        isSelected ? 'border-red-500 border-2 bg-red-50' : 'border-teal-100'
+      }`}
+      data-testid={`medication-card-${medication.id}`}
+    >
+      {deleteMode && (
+        <div className="absolute top-2 right-2">
+          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+            isSelected ? 'bg-red-500 border-red-500' : 'bg-white border-gray-300'
+          }`}>
+            {isSelected && <span className="text-white text-sm">✓</span>}
+          </div>
+        </div>
+      )}
       
-      <div className="flex justify-between items-start mb-2 pr-10">
+      <div className="flex justify-between items-start mb-2">
         <h3 className="font-bold text-gray-800">{medication.name}</h3>
-        <TakeMedicationButton medication={medication} onSuccess={onTaken} />
+        {!deleteMode && <TakeMedicationButton medication={medication} onSuccess={onTaken} />}
       </div>
       
       {medication.child_name && (
