@@ -415,25 +415,6 @@ const MedicationCard = ({ medication, onTaken, deleteMode, isSelected, onToggleS
   );
 };
 
-const AppointmentCard = ({ appointment }) => {
-  return (
-    <div className="bg-gradient-to-r from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="font-bold text-gray-800">{appointment.appointment_date}</p>
-          <p className="text-sm text-gray-600">{appointment.appointment_time}</p>
-          {appointment.notes && (
-            <p className="text-sm text-gray-500 mt-2">{appointment.notes}</p>
-          )}
-        </div>
-        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-          {appointment.status}
-        </span>
-      </div>
-    </div>
-  );
-};
-
 const ChildCard = ({ child }) => {
   const navigate = useNavigate();
   
