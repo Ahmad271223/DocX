@@ -190,16 +190,31 @@ const DashboardPage = () => {
           <TabsContent value="family" data-testid="family-content">
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Familienmitglieder</h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Familienmitglieder</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {children.length} von {childrenData.max_children} Kindern hinzugefügt
+                  </p>
+                </div>
                 <Button
                   data-testid="add-child-btn"
                   onClick={() => setShowChildModal(true)}
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full"
+                  disabled={!childrenData.can_add_more}
+                  className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex items-center gap-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Plus className="w-4 h-4" />
                   Kind hinzufügen
                 </Button>
               </div>
+              
+              {!childrenData.can_add_more && children.length >= childrenData.max_children && (
+                <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <p className="text-sm text-orange-700">
+                    Sie haben die maximale Anzahl von Kindern ({childrenData.max_children}) erreicht. 
+                    Bitte aktualisieren Sie Ihr Abonnement um mehr Kinder hinzuzufügen.
+                  </p>
+                </div>
+              )}
               
               {children.length === 0 ? (
                 <div className="text-center py-12">
