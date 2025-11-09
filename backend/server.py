@@ -477,6 +477,15 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
 
 @api_router.post("/children")
 async def add_child(request: AddChildRequest, current_user: User = Depends(get_current_user)):
+    # Check if user has reached max children limit
+    existing_children_count = await db.children.count_documents({"parent_id": current_user.id})
+    
+    if existing_children_count >= current_user.max_children:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Sie haben die maximale Anzahl von Kindern ({current_user.max_children}) erreicht. Bitte aktualisieren Sie Ihr Abonnement."
+        )
+    
     child = Child(
         parent_id=current_user.id,
         first_name=request.first_name,
@@ -492,7 +501,11 @@ async def add_child(request: AddChildRequest, current_user: User = Depends(get_c
 @api_router.get("/children")
 async def get_children(current_user: User = Depends(get_current_user)):
     children = await db.children.find({"parent_id": current_user.id}, {"_id": 0}).to_list(100)
-    return {"children": children}
+    return {
+        "children": children,
+        "max_children": current_user.max_children,
+        "can_add_more": len(children) < current_user.max_children
+    }
 
 # ============== MEDICATION ENDPOINTS ==============
 
