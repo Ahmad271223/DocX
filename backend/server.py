@@ -100,18 +100,27 @@ class DoctorProfile(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str  # Links to User with user_type="doctor"
-    name: str
+    practice_name: str  # Name der Praxis
+    practice_address: str  # Adresse der Praxis
+    practice_city: str
+    practice_postal_code: str
+    practice_phone: str
+    practice_email: EmailStr
+    doctor_names: List[str] = []  # Namen aller Ärzte in der Praxis
     specialty: str
     license_number: str
-    address: str
-    city: str
-    postal_code: str
-    phone: str
-    email: EmailStr
+    license_document: Optional[str] = None  # Base64 encoded document or URL
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: List[str] = []
     profile_image: Optional[str] = None
+    # Legacy fields for backward compatibility
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    postal_code: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class Doctor(BaseModel):
