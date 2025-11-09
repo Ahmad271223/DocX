@@ -395,10 +395,17 @@ const AppointmentCard = ({ appointment }) => {
 };
 
 const ChildCard = ({ child }) => {
+  const navigate = useNavigate();
+  
   return (
-    <div className="bg-gradient-to-br from-white to-emerald-50 border border-emerald-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
+    <div 
+      onClick={() => navigate(`/child/${child.id}`)}
+      className="bg-gradient-to-br from-white to-emerald-50 border border-emerald-100 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transition-transform"
+      data-testid={`child-card-${child.id}`}
+    >
       <h3 className="font-bold text-gray-800 mb-2">{child.first_name} {child.last_name}</h3>
       <p className="text-sm text-gray-600">Geburtsdatum: {child.birthdate}</p>
+      <p className="text-xs text-teal-600 mt-2">Klicken um Details anzuzeigen →</p>
     </div>
   );
 };
