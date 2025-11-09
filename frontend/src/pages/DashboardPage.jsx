@@ -295,7 +295,7 @@ const DashboardPage = () => {
   );
 };
 
-const MedicationCard = ({ medication }) => {
+const MedicationCard = ({ medication, onTaken }) => {
   const getStockColor = (stock) => {
     if (stock <= 1) return "text-red-600";
     if (stock <= 3) return "text-orange-600";
@@ -303,15 +303,56 @@ const MedicationCard = ({ medication }) => {
     return "text-green-600";
   };
 
+  const getStockWarning = (stock) => {
+    if (stock <= 1) return "Kritisch! Nur noch 1 Tablette!";
+    if (stock <= 3) return "Achtung! Nur noch 3 Tabletten!";
+    if (stock <= 5) return "Hinweis: Nur noch 5 Tabletten!";
+    return null;
+  };
+
+  const warning = getStockWarning(medication.stock);
+
   return (
     <div className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
-      <h3 className="font-bold text-gray-800 mb-2">{medication.name}</h3>
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-bold text-gray-800">{medication.name}</h3>
+        <TakeMedicationButton medication={medication} onSuccess={onTaken} />
+      </div>
+      
       <p className="text-sm text-gray-600 mb-1">Dosierung: {medication.dosage}</p>
       <p className="text-sm text-gray-600 mb-1">Häufigkeit: {medication.frequency}</p>
+      
+      {medication.frequency_times && medication.frequency_times.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2 mb-2">
+          {medication.frequency_times.map(time => (
+            <span key={time} className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded-full">
+              {time}
+            </span>
+          ))}
+        </div>
+      )}
+      
       <p className={`text-sm font-semibold ${getStockColor(medication.stock)}`}>
         Vorrat: {medication.stock} Stück
       </p>
+      
+      {warning && (
+        <div className={`mt-2 p-2 rounded-lg text-xs font-semibold ${
+          medication.stock <= 1 ? 'bg-red-100 text-red-700' :
+          medication.stock <= 3 ? 'bg-orange-100 text-orange-700' :
+          'bg-yellow-100 text-yellow-700'
+        }`}>
+          {warning}
+        </div>
+      )}
+      
       <p className="text-xs text-gray-500 mt-2">Ablauf: {medication.expiry_date}</p>
+      
+      {medication.last_taken && (
+        <p className="text-xs text-green-600 mt-1">
+          Zuletzt eingenommen: {new Date(medication.last_taken).toLocaleString('de-DE')}
+        </p>
+      )}
     </div>
   );
 };
