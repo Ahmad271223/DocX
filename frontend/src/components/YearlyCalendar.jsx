@@ -80,13 +80,52 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
 
     setLoading(true);
     try {
-      await axios.post(
-        `${API}/schedule`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+      // Create entries based on recurrence
+      const entriesToCreate = [];
+      const startDate = new Date(formData.date);
+      
+      if (formData.recurrence === 'once') {
+        entriesToCreate.push({ ...formData });
+      } else if (formData.recurrence === 'weekly-2') {
+        // Alle 2 Wochen für recurrence_count Mal
+        for (let i = 0; i < formData.recurrence_count; i++) {
+          const newDate = new Date(startDate);
+          newDate.setDate(startDate.getDate() + (i * 14));
+          entriesToCreate.push({
+            ...formData,
+            date: newDate.toISOString().split('T')[0]
+          });
+        }
+      } else if (formData.recurrence === 'weekly-4') {
+        // Alle 4 Wochen für recurrence_count Mal
+        for (let i = 0; i < formData.recurrence_count; i++) {
+          const newDate = new Date(startDate);
+          newDate.setDate(startDate.getDate() + (i * 28));
+          entriesToCreate.push({
+            ...formData,
+            date: newDate.toISOString().split('T')[0]
+          });
+        }
+      } else if (formData.recurrence === 'forever') {
+        // Für immer = 52 Wochen (1 Jahr)
+        for (let i = 0; i < 52; i++) {
+          const newDate = new Date(startDate);
+          newDate.setDate(startDate.getDate() + (i * 7));
+          entriesToCreate.push({
+            ...formData,
+            date: newDate.toISOString().split('T')[0]
+          });
+        }
+      }
+
+      // Create all entries
+      await Promise.all(
+        entriesToCreate.map(entry => 
+          axios.post(`${API}/schedule`, entry, { headers: { Authorization: `Bearer ${token}` } })
+        )
       );
       
-      toast.success('Eintrag hinzugefügt!');
+      toast.success(`${entriesToCreate.length} Termin(e) hinzugefügt!`);
       setFormData({
         date: '',
         time: '08:00',
@@ -94,7 +133,9 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
         title: '',
         category: 'other',
         description: '',
-        child_id: selectedChild || ''
+        child_id: selectedChild || '',
+        recurrence: 'once',
+        recurrence_count: 1
       });
       setShowAddModal(false);
       fetchSchedule();
