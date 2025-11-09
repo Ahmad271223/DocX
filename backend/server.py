@@ -53,6 +53,7 @@ class User(BaseModel):
     subscription_status: str = "pending"  # pending, active, cancelled
     subscription_plan: Optional[str] = None
     subscription_amount: float = 0.0
+    max_children: int = 0  # Maximum number of children allowed based on subscription
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class Child(BaseModel):
