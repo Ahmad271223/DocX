@@ -1103,7 +1103,7 @@ async def get_upcoming_appointments(current_user: User = Depends(get_current_use
             all_appointments.append({
                 "type": "appointment",
                 "id": apt["id"],
-                "title": f"Arzttermin",
+                "title": "Arzttermin",
                 "date": apt["appointment_date"],
                 "time": apt["appointment_time"],
                 "notes": apt.get("notes")
