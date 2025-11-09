@@ -1145,17 +1145,26 @@ async def create_doctor_profile(request: CreateDoctorProfileRequest, current_use
     
     profile = DoctorProfile(
         user_id=current_user.id,
-        name=f"{current_user.first_name} {current_user.last_name}",
+        practice_name=request.practice_name,
+        practice_address=request.practice_address,
+        practice_city=request.practice_city,
+        practice_postal_code=request.practice_postal_code,
+        practice_phone=request.practice_phone,
+        practice_email=request.practice_email,
+        doctor_names=request.doctor_names,
         specialty=request.specialty,
         license_number=request.license_number,
-        address=request.address,
-        city=request.city,
-        postal_code=request.postal_code,
-        phone=request.phone,
-        email=current_user.email,
+        license_document=request.license_document,
         bio=request.bio,
         years_of_experience=request.years_of_experience,
-        languages=request.languages
+        languages=request.languages,
+        # Legacy fields for backward compatibility
+        name=request.practice_name,
+        address=request.practice_address,
+        city=request.practice_city,
+        postal_code=request.practice_postal_code,
+        phone=request.practice_phone,
+        email=request.practice_email
     )
     
     await db.doctor_profiles.insert_one(profile.model_dump())
