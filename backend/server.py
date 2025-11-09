@@ -71,10 +71,15 @@ class Medication(BaseModel):
     user_id: str
     name: str
     dosage: str
-    frequency: str
+    frequency: str  # e.g., "2x täglich"
+    frequency_times: List[str] = []  # e.g., ["08:00", "20:00"]
     stock: int
     expiry_date: str
     prescription_number: Optional[str] = None
+    barcode: Optional[str] = None
+    prescription_image: Optional[str] = None  # Base64 or URL
+    reminder_enabled: bool = True
+    last_taken: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class Pharmacy(BaseModel):
