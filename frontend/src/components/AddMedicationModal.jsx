@@ -94,7 +94,8 @@ const AddMedicationModal = ({ open, onClose, onSuccess, childId = null }) => {
         expiry_date: "",
         prescription_number: "",
         barcode: "",
-        reminder_enabled: true
+        reminder_enabled: true,
+        child_id: childId || ""
       });
       onSuccess();
       onClose();
