@@ -255,15 +255,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "User-Type (patient/doctor) hinzufügen"
-    - "DoctorProfile Model und CRUD Endpoints"
-    - "DoctorAvailability Model und Endpoints"
-    - "DoctorVacation Model und Endpoints"
-    - "Doctor-Patient Subscription System"
-    - "Doctor Dashboard und Patient List"
-    - "Recurring Appointments"
-    - "Smart Prescription Warnings"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
