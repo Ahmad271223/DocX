@@ -247,6 +247,89 @@ backend:
         comment: "✅ TESTED: Smart prescription warnings working excellently. GET /api/medications/prescription-warnings correctly calculates medication runout dates based on frequency (e.g., '2x täglich'), checks against subscribed doctors' vacation periods, and generates detailed warnings with severity levels. Tested with medication running out during doctor vacation - warning generated with complete details including German message."
 
 frontend:
+  - task: "Landing Page Footer mit Arzt-Link"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/LandingPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Footer erweitert mit Link 'Als Arztpraxis registrieren/anmelden' der zu /doctor-register führt"
+  
+  - task: "Arzt-Registrierungsseite mit erweiterten Feldern"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DoctorRegisterPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Vollständige Registrierungsseite mit allen erforderlichen Feldern: Praxis-Name, Adresse, Email, Telefon, Ärzte-Namen (dynamisch mehrere), Fachgebiet, Lizenznummer, Dokument-Upload, Passwort"
+  
+  - task: "Arzt-Login-Seite"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DoctorLoginPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Login-Seite für Ärzte mit Praxis-Email und Passwort. Verifiziert user_type='doctor'"
+  
+  - task: "Arzt-Dashboard"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DoctorDashboardPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Dashboard mit Übersicht (heutige Termine, Urlaube), Patienten-Tab, Verfügbarkeits-Tab, Urlaubs-Tab. Zeigt Stats-Cards mit Anzahlen."
+  
+  - task: "Verfügbarkeits-Manager Komponente"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/DoctorAvailabilityManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Komponente zum Hinzufügen/Anzeigen/Löschen von wöchentlichen Verfügbarkeitszeiten. Wochentag, Zeit von-bis, Termin-Dauer"
+  
+  - task: "Urlaubs-Manager Komponente"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/DoctorVacationManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Komponente zum Hinzufügen/Anzeigen/Löschen von Urlaubszeiten. Start/End-Datum, Grund (optional)"
+  
+  - task: "App Routen für Ärzte"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Routen hinzugefügt: /doctor-register, /doctor-login, /doctor-dashboard mit entsprechenden Guards basierend auf user_type"
 
 metadata:
   created_by: "main_agent"
