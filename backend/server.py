@@ -50,6 +50,7 @@ class User(BaseModel):
     postal_code: str
     email: EmailStr
     password_hash: str
+    user_type: str = "patient"  # patient, doctor
     subscription_status: str = "pending"  # pending, active, cancelled
     subscription_plan: Optional[str] = None
     subscription_amount: float = 0.0
