@@ -11,7 +11,7 @@ import AddMedicationModal from "@/components/AddMedicationModal";
 import AddAppointmentModal from "@/components/AddAppointmentModal";
 import AddVitalSignsModal from "@/components/AddVitalSignsModal";
 import TakeMedicationButton from "@/components/TakeMedicationButton";
-import DateSchedule from "@/components/DateSchedule";
+import YearlyCalendar from "@/components/YearlyCalendar";
 
 const ChildDashboardPage = () => {
   const navigate = useNavigate();
