@@ -10,7 +10,7 @@ import { Camera, Scan, Plus, X } from "lucide-react";
 import ScanPrescriptionModal from "./ScanPrescriptionModal";
 import ScanBarcodeModal from "./ScanBarcodeModal";
 
-const AddMedicationModal = ({ open, onClose, onSuccess }) => {
+const AddMedicationModal = ({ open, onClose, onSuccess, childId = null }) => {
   const { token } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
@@ -24,7 +24,8 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
     expiry_date: "",
     prescription_number: "",
     barcode: "",
-    reminder_enabled: true
+    reminder_enabled: true,
+    child_id: childId || ""
   });
   const [newTime, setNewTime] = useState("08:00");
 
