@@ -101,3 +101,181 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Erweitern der bestehenden Medikamenten-App um folgende Features:
+  
+  PHASE 1: Ärzte-Modul
+  - Ärzte können Profile erstellen mit Fachgebiet, Lizenz, etc.
+  - Ärzte können verfügbare Terminzeiten definieren (wöchentlich)
+  - Ärzte können Urlaubszeiten eintragen
+  - Patienten können Ärzte suchen und abonnieren
+  - Wiederkehrende Termine (alle 2-3 Wochen)
+  - Automatische Benachrichtigung wenn Rezept während Arzt-Urlaub ausläuft
+  - Ärzte-Dashboard mit Kalender, Patientenliste, heutige Termine
+  
+  PHASE 2: Familie & Notfall-Funktion
+  - Nutzer können Familie/Freunde über Code/Link verbinden
+  - Medikamente und Termine von Verbundenen sehen
+  - Notfall-Medikamentensuche (wer hat welches Medikament)
+  
+  PHASE 3: Externe Integrationen
+  - eRezept API
+  - Apothekenbestände (IhreApotheken.de / Noweda)
+  - Krankenkassenkarte einlesen
+  - Online-Preisvergleich
+
+backend:
+  - task: "User-Type (patient/doctor) hinzufügen"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "User-Model erweitert mit user_type field (patient/doctor). Registrierung und Login aktualisiert."
+  
+  - task: "DoctorProfile Model und CRUD Endpoints"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DoctorProfile Model mit allen Details erstellt. Endpoints: POST/GET/PUT /api/doctors/profile, GET /api/doctors/search, GET /api/doctors/{id}/profile"
+  
+  - task: "DoctorAvailability Model und Endpoints"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DoctorAvailability Model für wöchentliche Verfügbarkeit. Endpoints: POST/GET/DELETE /api/doctors/availability"
+  
+  - task: "DoctorVacation Model und Endpoints"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DoctorVacation Model für Urlaubszeiten. Endpoints: POST/GET/DELETE /api/doctors/vacation"
+  
+  - task: "Doctor-Patient Subscription System"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DoctorPatientSubscription Model. Endpoints: POST /api/doctors/{id}/subscribe, GET /api/doctors/my-subscriptions, DELETE /api/doctors/subscriptions/{id}"
+  
+  - task: "Doctor Dashboard und Patient List"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Doctor Dashboard zeigt Profile, heutige Termine, Patientenanzahl, Verfügbarkeit, Urlaub. Endpoints: GET /api/doctors/dashboard, GET /api/doctors/patients, GET /api/doctors/appointments/today"
+  
+  - task: "Recurring Appointments"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Appointment Model erweitert mit is_recurring, recurrence_interval_weeks. Endpoint: POST /api/appointments/recurring erstellt mehrere Termine automatisch."
+  
+  - task: "Smart Prescription Warnings"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Intelligente Logik die prüft ob Medikamente während Arzt-Urlaub auslaufen. Warnt 1-2 Wochen vorher. Endpoint: GET /api/medications/prescription-warnings"
+
+frontend:
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User-Type (patient/doctor) hinzufügen"
+    - "DoctorProfile Model und CRUD Endpoints"
+    - "DoctorAvailability Model und Endpoints"
+    - "DoctorVacation Model und Endpoints"
+    - "Doctor-Patient Subscription System"
+    - "Doctor Dashboard und Patient List"
+    - "Recurring Appointments"
+    - "Smart Prescription Warnings"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Backend Phase 1 (Ärzte-Modul) vollständig implementiert.
+      
+      Implementierte Features:
+      1. User kann sich als "patient" oder "doctor" registrieren
+      2. Ärzte können detaillierte Profile erstellen (Fachgebiet, Lizenz, etc.)
+      3. Ärzte können wöchentliche Verfügbarkeitszeiten definieren
+      4. Ärzte können Urlaubszeiten eintragen
+      5. Patienten können Ärzte suchen und abonnieren
+      6. Wiederkehrende Termine (z.B. alle 2 Wochen)
+      7. Doctor Dashboard mit allen wichtigen Infos
+      8. Smart Warnings: App warnt wenn Medikament während Arzt-Urlaub ausläuft
+      
+      Bitte teste alle neuen Backend-Endpunkte:
+      - Auth mit user_type
+      - Doctor Profile CRUD
+      - Doctor Availability
+      - Doctor Vacation
+      - Subscriptions
+      - Dashboard
+      - Recurring Appointments
+      - Prescription Warnings
+      
+      Teste mit verschiedenen Szenarien:
+      - Doctor Registration
+      - Patient Registration
+      - Doctor erstellt Profil
+      - Doctor setzt Verfügbarkeit
+      - Doctor setzt Urlaub
+      - Patient sucht Ärzte
+      - Patient abonniert Arzt
+      - Patient erstellt wiederkehrende Termine
+      - Prescription Warning während Urlaub
