@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Heart, Pill, Calendar, Users, Activity, LogOut, Plus, CalendarDays, Trash2 } from "lucide-react";
+import { Heart, Pill, Calendar, Users, Activity, LogOut, Plus, CalendarDays, Trash2, CalendarRange } from "lucide-react";
 import AddMedicationModal from "@/components/AddMedicationModal";
 import AddChildModal from "@/components/AddChildModal";
 import AddAppointmentModal from "@/components/AddAppointmentModal";
