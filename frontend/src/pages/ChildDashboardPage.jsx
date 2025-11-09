@@ -104,12 +104,33 @@ const ChildDashboardPage = () => {
     };
 
     const warning = getStockWarning(medication.stock);
+    const isSelected = selectedMedications.includes(medication.id);
 
     return (
-      <div className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 rounded-xl p-4 hover:shadow-lg transition-shadow">
+      <div 
+        className={`bg-gradient-to-br from-white to-teal-50 border rounded-xl p-4 hover:shadow-lg transition-all cursor-pointer ${
+          deleteMode 
+            ? isSelected 
+              ? 'border-red-500 bg-red-50' 
+              : 'border-gray-300 hover:border-red-300'
+            : 'border-teal-100'
+        }`}
+        onClick={deleteMode ? () => toggleMedicationSelection(medication.id) : undefined}
+      >
+        {deleteMode && (
+          <div className="flex justify-center mb-2">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => toggleMedicationSelection(medication.id)}
+              className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
+            />
+          </div>
+        )}
+        
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-bold text-gray-800">{medication.name}</h3>
-          <TakeMedicationButton medication={medication} onSuccess={onTaken} />
+          {!deleteMode && <TakeMedicationButton medication={medication} onSuccess={onTaken} />}
         </div>
         
         <p className="text-sm text-gray-600 mb-1">Dosierung: {medication.dosage}</p>
