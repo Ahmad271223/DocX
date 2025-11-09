@@ -902,6 +902,69 @@ async def update_schedule_entry(
     
     return {"message": "Schedule entry updated successfully"}
 
+# ============== RECURRING WEEKLY SCHEDULE ENDPOINTS ==============
+
+@api_router.post("/schedule/weekly")
+async def add_recurring_schedule(request: AddRecurringScheduleRequest, current_user: User = Depends(get_current_user)):
+    child_name = None
+    if request.child_id:
+        child = await db.children.find_one({"id": request.child_id, "parent_id": current_user.id})
+        if child:
+            child_name = f"{child['first_name']} {child['last_name']}"
+    
+    entry = RecurringScheduleEntry(
+        user_id=current_user.id,
+        child_id=request.child_id,
+        child_name=child_name,
+        day_of_week=request.day_of_week,
+        start_hour=request.start_hour,
+        end_hour=request.end_hour,
+        title=request.title,
+        category=request.category,
+        description=request.description,
+        color=get_category_color(request.category)
+    )
+    
+    entry_dict = entry.model_dump()
+    await db.recurring_schedule.insert_one(entry_dict)
+    
+    return {"message": "Recurring schedule entry added successfully", "entry": entry}
+
+@api_router.get("/schedule/weekly")
+async def get_recurring_schedule(current_user: User = Depends(get_current_user), child_id: Optional[str] = None):
+    if child_id:
+        schedule = await db.recurring_schedule.find(
+            {"user_id": current_user.id, "child_id": child_id},
+            {"_id": 0}
+        ).to_list(500)
+    else:
+        schedule = await db.recurring_schedule.find(
+            {"user_id": current_user.id},
+            {"_id": 0}
+        ).to_list(500)
+    
+    # Organize by day_of_week and hour
+    organized = {}
+    for entry in schedule:
+        for hour in range(entry["start_hour"], entry["end_hour"]):
+            key = f"{entry['day_of_week']}-{hour}"
+            if key not in organized:
+                organized[key] = []
+            organized[key].append(entry)
+    
+    return {"schedule": organized}
+
+@api_router.delete("/schedule/weekly/{entry_id}")
+async def delete_recurring_schedule(entry_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.recurring_schedule.delete_one(
+        {"id": entry_id, "user_id": current_user.id}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    
+    return {"message": "Recurring schedule entry deleted successfully"}
+
 @api_router.get("/appointments/upcoming")
 async def get_upcoming_appointments(current_user: User = Depends(get_current_user)):
     # Get appointments in the next 2 days
