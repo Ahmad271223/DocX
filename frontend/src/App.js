@@ -1,54 +1,72 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import "@/App.css";
+import RegisterPage from "@/pages/RegisterPage";
+import LoginPage from "@/pages/LoginPage";
+import DashboardPage from "@/pages/DashboardPage";
+import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
+import PaymentCancelPage from "@/pages/PaymentCancelPage";
+import LandingPage from "@/pages/LandingPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+export const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
+export const AuthContext = React.createContext();
+
+function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      fetchUser();
+    }
+  }, [token]);
+
+  const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+      const response = await axios.get(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(response.data);
+    } catch (error) {
+      console.error("Failed to fetch user", error);
+      logout();
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  const login = (newToken, userData) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setUser(null);
+  };
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+          <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <LoginPage />} />
+          <Route path="/dashboard" element={token ? <DashboardPage /> : <Navigate to="/login" />} />
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/payment-cancel" element={<PaymentCancelPage />} />
         </Routes>
       </BrowserRouter>
-    </div>
+      <Toaster position="top-right" />
+    </AuthContext.Provider>
   );
 }
 
 export default App;
+
+import React from 'react';
