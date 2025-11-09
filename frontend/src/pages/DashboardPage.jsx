@@ -151,7 +151,7 @@ const DashboardPage = () => {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {medications.map(med => (
-                    <MedicationCard key={med.id} medication={med} />
+                    <MedicationCard key={med.id} medication={med} onTaken={fetchData} />
                   ))}
                 </div>
               )}
