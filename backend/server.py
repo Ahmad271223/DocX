@@ -395,8 +395,10 @@ async def register(request: RegisterRequest):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Calculate subscription amount
-    subscription_amount = calculate_subscription_amount(request.num_children)
+    # Calculate subscription amount (only for patients with children)
+    subscription_amount = 0
+    if request.user_type == "patient":
+        subscription_amount = calculate_subscription_amount(request.num_children)
     
     # Create user
     user = User(
@@ -409,8 +411,10 @@ async def register(request: RegisterRequest):
         postal_code=request.postal_code,
         email=request.email,
         password_hash=hash_password(request.password),
+        user_type=request.user_type,
         subscription_amount=subscription_amount,
-        max_children=request.num_children  # Store max allowed children
+        max_children=request.num_children,  # Store max allowed children
+        subscription_status="active" if request.user_type == "doctor" else "pending"  # Doctors don't need subscription
     )
     
     user_dict = user.model_dump()
@@ -427,6 +431,7 @@ async def register(request: RegisterRequest):
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "user_type": user.user_type,
             "subscription_amount": subscription_amount,
             "num_children": request.num_children
         }
