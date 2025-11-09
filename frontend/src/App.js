@@ -7,6 +7,7 @@ import "@/App.css";
 import RegisterPage from "@/pages/RegisterPage";
 import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
+import ChildDashboardPage from "@/pages/ChildDashboardPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 import PaymentCancelPage from "@/pages/PaymentCancelPage";
 import LandingPage from "@/pages/LandingPage";
