@@ -40,20 +40,16 @@ const DashboardPage = () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       
-      const [medsRes, childrenRes, appointmentsRes, vitalRes, pharmaciesRes] = await Promise.all([
+      const [medsRes, childrenRes, vitalRes] = await Promise.all([
         axios.get(`${API}/medications`, { headers }),
         axios.get(`${API}/children`, { headers }),
-        axios.get(`${API}/appointments`, { headers }),
-        axios.get(`${API}/vital-signs`, { headers }),
-        axios.get(`${API}/pharmacies`)
+        axios.get(`${API}/vital-signs`, { headers })
       ]);
 
       setMedications(medsRes.data.medications);
       setChildrenData(childrenRes.data);
       setChildren(childrenRes.data.children);
-      setAppointments(appointmentsRes.data.appointments);
       setVitalSigns(vitalRes.data.vital_signs);
-      setPharmacies(pharmaciesRes.data.pharmacies);
     } catch (error) {
       console.error("Failed to fetch data", error);
     }
