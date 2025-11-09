@@ -146,25 +146,21 @@ const DashboardPage = () => {
               <Pill className="w-4 h-4" />
               Medikamente
             </TabsTrigger>
-            <TabsTrigger value="appointments" data-testid="tab-appointments" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Termine
+            <TabsTrigger value="calendar" data-testid="tab-calendar" className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4" />
+              Kalender
+            </TabsTrigger>
+            <TabsTrigger value="emergency" data-testid="tab-emergency" className="flex items-center gap-2">
+              <Heart className="w-4 h-4" />
+              Notfall-Adressen
+            </TabsTrigger>
+            <TabsTrigger value="vitals" data-testid="tab-vitals" className="flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Vitalwerte/Blutzucker
             </TabsTrigger>
             <TabsTrigger value="family" data-testid="tab-family" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Familie
-            </TabsTrigger>
-            <TabsTrigger value="vitals" data-testid="tab-vitals" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Vitalwerte
-            </TabsTrigger>
-            <TabsTrigger value="pharmacies" data-testid="tab-pharmacies" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              Apotheken
-            </TabsTrigger>
-            <TabsTrigger value="calendar" data-testid="tab-calendar" className="flex items-center gap-2">
-              <CalendarDays className="w-4 h-4" />
-              Kalender
             </TabsTrigger>
           </TabsList>
 
