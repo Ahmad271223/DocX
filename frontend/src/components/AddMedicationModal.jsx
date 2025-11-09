@@ -105,24 +105,49 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Medikament hinzufügen</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              name="name"
-              data-testid="medication-name-input"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="z.B. Aspirin"
-              className="mt-1"
-            />
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Medikament hinzufügen</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex gap-2 mb-4">
+            <Button
+              type="button"
+              onClick={() => setShowPrescriptionModal(true)}
+              variant="outline"
+              className="flex-1 flex items-center gap-2"
+              data-testid="open-prescription-scan-btn"
+            >
+              <Camera className="w-4 h-4" />
+              Rezept scannen
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setShowBarcodeModal(true)}
+              variant="outline"
+              className="flex-1 flex items-center gap-2"
+              data-testid="open-barcode-scan-btn"
+            >
+              <Scan className="w-4 h-4" />
+              Barcode scannen
+            </Button>
           </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                name="name"
+                data-testid="medication-name-input"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="z.B. Aspirin"
+                className="mt-1"
+              />
+            </div>
           <div>
             <Label htmlFor="dosage">Dosierung *</Label>
             <Input
