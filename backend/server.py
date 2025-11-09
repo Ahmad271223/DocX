@@ -69,6 +69,8 @@ class Medication(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
+    child_id: Optional[str] = None  # If medication belongs to a child
+    child_name: Optional[str] = None  # For display in parent view
     name: str
     dosage: str
     frequency: str  # e.g., "2x täglich"
