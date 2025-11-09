@@ -1626,7 +1626,6 @@ async def get_prescription_warnings(current_user: User = Depends(get_current_use
                 if vacation_start <= runout_date <= vacation_end:
                     # Warn 1-2 weeks before
                     warning_date_2weeks = vacation_start - timedelta(weeks=2)
-                    warning_date_1week = vacation_start - timedelta(weeks=1)
                     today = datetime.now(timezone.utc).date()
                     
                     if warning_date_2weeks <= today <= vacation_start:
