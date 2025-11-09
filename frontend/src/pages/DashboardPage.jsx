@@ -102,6 +102,8 @@ const DashboardPage = () => {
           <p className="text-gray-600">Verwalten Sie Ihre Gesundheit und die Ihrer Familie</p>
         </div>
 
+        <UpcomingAppointments />
+
         <Tabs defaultValue="medications" className="space-y-6">
           <TabsList className="bg-white border border-teal-100 p-1 rounded-xl shadow-sm">
             <TabsTrigger value="medications" data-testid="tab-medications" className="flex items-center gap-2">
