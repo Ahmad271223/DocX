@@ -18,12 +18,12 @@ const ChildDashboardPage = () => {
   const { token } = useContext(AuthContext);
   const [child, setChild] = useState(null);
   const [medications, setMedications] = useState([]);
-  const [appointments, setAppointments] = useState([]);
   const [vitalSigns, setVitalSigns] = useState([]);
   
   const [showMedicationModal, setShowMedicationModal] = useState(false);
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedMedications, setSelectedMedications] = useState([]);
 
   useEffect(() => {
     fetchChildDashboard();
