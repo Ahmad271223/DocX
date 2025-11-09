@@ -738,16 +738,35 @@ async def get_vital_signs(current_user: User = Depends(get_current_user)):
 
 # ============== WEEKLY SCHEDULE ENDPOINTS ==============
 
+def get_category_color(category: str) -> str:
+    colors = {
+        "food": "#10b981",  # Green
+        "sport": "#3b82f6",  # Blue
+        "doctor": "#ef4444",  # Red
+        "other": "#14b8a6"   # Teal (default)
+    }
+    return colors.get(category, "#14b8a6")
+
 @api_router.post("/schedule")
 async def add_schedule_entry(request: AddScheduleEntryRequest, current_user: User = Depends(get_current_user)):
+    # Get child name if child_id provided
+    child_name = None
+    if request.child_id:
+        child = await db.children.find_one({"id": request.child_id, "parent_id": current_user.id})
+        if child:
+            child_name = f"{child['first_name']} {child['last_name']}"
+    
     entry = WeeklyScheduleEntry(
         user_id=current_user.id,
-        day_of_week=request.day_of_week,
-        start_time=request.start_time,
+        child_id=request.child_id,
+        child_name=child_name,
+        date=request.date,
+        time=request.time,
         end_time=request.end_time,
         title=request.title,
+        category=request.category,
         description=request.description,
-        color=request.color
+        color=get_category_color(request.category)
     )
     
     entry_dict = entry.model_dump()
@@ -756,19 +775,27 @@ async def add_schedule_entry(request: AddScheduleEntryRequest, current_user: Use
     return {"message": "Schedule entry added successfully", "entry": entry}
 
 @api_router.get("/schedule")
-async def get_schedule(current_user: User = Depends(get_current_user)):
-    schedule = await db.weekly_schedule.find(
-        {"user_id": current_user.id},
-        {"_id": 0}
-    ).to_list(500)
+async def get_schedule(current_user: User = Depends(get_current_user), child_id: Optional[str] = None):
+    # If child_id provided, get only that child's schedule
+    # Otherwise, get all schedule (user's own + all children)
     
-    # Organize by day of week
-    organized = {i: [] for i in range(7)}
-    for entry in schedule:
-        day = entry["day_of_week"]
-        organized[day].append(entry)
+    if child_id:
+        # Get specific child's schedule
+        schedule = await db.weekly_schedule.find(
+            {"user_id": current_user.id, "child_id": child_id},
+            {"_id": 0}
+        ).to_list(5000)
+    else:
+        # Get all schedule (user's + all children)
+        schedule = await db.weekly_schedule.find(
+            {"user_id": current_user.id},
+            {"_id": 0}
+        ).to_list(5000)
     
-    return {"schedule": organized}
+    # Sort by date and time
+    schedule.sort(key=lambda x: (x["date"], x["time"]))
+    
+    return {"schedule": schedule}
 
 @api_router.delete("/schedule/{entry_id}")
 async def delete_schedule_entry(entry_id: str, current_user: User = Depends(get_current_user)):
