@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Heart, Pill, Calendar, Users, Activity, LogOut, Plus } from "lucide-react";
+import { Heart, Pill, Calendar, Users, Activity, LogOut, Plus, CalendarDays } from "lucide-react";
 import AddMedicationModal from "@/components/AddMedicationModal";
 import AddChildModal from "@/components/AddChildModal";
 import AddAppointmentModal from "@/components/AddAppointmentModal";
 import AddVitalSignsModal from "@/components/AddVitalSignsModal";
+import TakeMedicationButton from "@/components/TakeMedicationButton";
+import WeeklySchedule from "@/components/WeeklySchedule";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
