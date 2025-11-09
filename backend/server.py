@@ -212,6 +212,7 @@ class AddVitalSignsRequest(BaseModel):
     blood_pressure: Optional[str] = None
     temperature: Optional[float] = None
     weight: Optional[float] = None
+    child_id: Optional[str] = None
 
 class CheckoutRequest(BaseModel):
     origin_url: str
