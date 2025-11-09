@@ -168,13 +168,9 @@ const DashboardPage = () => {
               <Heart className="w-4 h-4" />
               Apotheken
             </TabsTrigger>
-            <TabsTrigger value="schedule" data-testid="tab-schedule" className="flex items-center gap-2">
+            <TabsTrigger value="calendar" data-testid="tab-calendar" className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
-              Terminplan
-            </TabsTrigger>
-            <TabsTrigger value="weekly" data-testid="tab-weekly" className="flex items-center gap-2">
-              <CalendarRange className="w-4 h-4" />
-              Wochenplan
+              Kalender
             </TabsTrigger>
           </TabsList>
 
