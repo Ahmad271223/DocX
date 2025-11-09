@@ -1105,6 +1105,549 @@ async def get_upcoming_appointments(current_user: User = Depends(get_current_use
     
     return {"upcoming_appointments": all_appointments}
 
+# ============== DOCTOR PROFILE ENDPOINTS ==============
+
+@api_router.post("/doctors/profile")
+async def create_doctor_profile(request: CreateDoctorProfileRequest, current_user: User = Depends(get_current_user)):
+    # Verify user is a doctor
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can create doctor profiles")
+    
+    # Check if profile already exists
+    existing_profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if existing_profile:
+        raise HTTPException(status_code=400, detail="Doctor profile already exists")
+    
+    profile = DoctorProfile(
+        user_id=current_user.id,
+        name=f"{current_user.first_name} {current_user.last_name}",
+        specialty=request.specialty,
+        license_number=request.license_number,
+        address=request.address,
+        city=request.city,
+        postal_code=request.postal_code,
+        phone=request.phone,
+        email=current_user.email,
+        bio=request.bio,
+        years_of_experience=request.years_of_experience,
+        languages=request.languages
+    )
+    
+    await db.doctor_profiles.insert_one(profile.model_dump())
+    
+    return {"message": "Doctor profile created successfully", "profile": profile}
+
+@api_router.get("/doctors/profile")
+async def get_doctor_profile(current_user: User = Depends(get_current_user)):
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id}, {"_id": 0})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    return {"profile": profile}
+
+@api_router.put("/doctors/profile")
+async def update_doctor_profile(request: UpdateDoctorProfileRequest, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can update doctor profiles")
+    
+    update_data = {k: v for k, v in request.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    result = await db.doctor_profiles.update_one(
+        {"user_id": current_user.id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    return {"message": "Doctor profile updated successfully"}
+
+@api_router.get("/doctors/search")
+async def search_doctors(
+    specialty: Optional[str] = None,
+    city: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    query = {}
+    if specialty:
+        query["specialty"] = {"$regex": specialty, "$options": "i"}
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    doctors = await db.doctor_profiles.find(query, {"_id": 0}).to_list(100)
+    return {"doctors": doctors}
+
+@api_router.get("/doctors/{doctor_id}/profile")
+async def get_doctor_profile_by_id(doctor_id: str, current_user: User = Depends(get_current_user)):
+    profile = await db.doctor_profiles.find_one({"id": doctor_id}, {"_id": 0})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    return {"profile": profile}
+
+# ============== DOCTOR AVAILABILITY ENDPOINTS ==============
+
+@api_router.post("/doctors/availability")
+async def add_doctor_availability(request: AddDoctorAvailabilityRequest, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can set availability")
+    
+    # Get doctor profile
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found. Create a profile first.")
+    
+    availability = DoctorAvailability(
+        doctor_id=profile["id"],
+        day_of_week=request.day_of_week,
+        start_time=request.start_time,
+        end_time=request.end_time,
+        slot_duration=request.slot_duration
+    )
+    
+    await db.doctor_availability.insert_one(availability.model_dump())
+    
+    return {"message": "Availability added successfully", "availability": availability}
+
+@api_router.get("/doctors/availability")
+async def get_doctor_availability(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can view their availability")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    availability = await db.doctor_availability.find({"doctor_id": profile["id"]}, {"_id": 0}).to_list(100)
+    return {"availability": availability}
+
+@api_router.get("/doctors/{doctor_id}/availability")
+async def get_doctor_availability_by_id(doctor_id: str, current_user: User = Depends(get_current_user)):
+    availability = await db.doctor_availability.find({"doctor_id": doctor_id}, {"_id": 0}).to_list(100)
+    return {"availability": availability}
+
+@api_router.delete("/doctors/availability/{availability_id}")
+async def delete_doctor_availability(availability_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can delete availability")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    result = await db.doctor_availability.delete_one({
+        "id": availability_id,
+        "doctor_id": profile["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Availability not found")
+    
+    return {"message": "Availability deleted successfully"}
+
+# ============== DOCTOR VACATION ENDPOINTS ==============
+
+@api_router.post("/doctors/vacation")
+async def add_doctor_vacation(request: AddDoctorVacationRequest, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can set vacation periods")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    vacation = DoctorVacation(
+        doctor_id=profile["id"],
+        start_date=request.start_date,
+        end_date=request.end_date,
+        reason=request.reason
+    )
+    
+    await db.doctor_vacations.insert_one(vacation.model_dump())
+    
+    return {"message": "Vacation period added successfully", "vacation": vacation}
+
+@api_router.get("/doctors/vacation")
+async def get_doctor_vacations(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can view their vacation periods")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    vacations = await db.doctor_vacations.find({"doctor_id": profile["id"]}, {"_id": 0}).to_list(100)
+    return {"vacations": vacations}
+
+@api_router.get("/doctors/{doctor_id}/vacation")
+async def get_doctor_vacation_by_id(doctor_id: str, current_user: User = Depends(get_current_user)):
+    vacations = await db.doctor_vacations.find({"doctor_id": doctor_id}, {"_id": 0}).to_list(100)
+    return {"vacations": vacations}
+
+@api_router.delete("/doctors/vacation/{vacation_id}")
+async def delete_doctor_vacation(vacation_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can delete vacation periods")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    result = await db.doctor_vacations.delete_one({
+        "id": vacation_id,
+        "doctor_id": profile["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Vacation period not found")
+    
+    return {"message": "Vacation period deleted successfully"}
+
+# ============== DOCTOR-PATIENT SUBSCRIPTION ENDPOINTS ==============
+
+@api_router.post("/doctors/{doctor_id}/subscribe")
+async def subscribe_to_doctor(doctor_id: str, current_user: User = Depends(get_current_user)):
+    # Verify doctor exists
+    doctor_profile = await db.doctor_profiles.find_one({"id": doctor_id})
+    if not doctor_profile:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    # Check if already subscribed
+    existing_sub = await db.doctor_patient_subscriptions.find_one({
+        "doctor_id": doctor_id,
+        "patient_id": current_user.id,
+        "status": "active"
+    })
+    
+    if existing_sub:
+        raise HTTPException(status_code=400, detail="Already subscribed to this doctor")
+    
+    subscription = DoctorPatientSubscription(
+        doctor_id=doctor_id,
+        patient_id=current_user.id
+    )
+    
+    await db.doctor_patient_subscriptions.insert_one(subscription.model_dump())
+    
+    return {"message": "Successfully subscribed to doctor", "subscription": subscription}
+
+@api_router.get("/doctors/my-subscriptions")
+async def get_my_doctor_subscriptions(current_user: User = Depends(get_current_user)):
+    subscriptions = await db.doctor_patient_subscriptions.find(
+        {"patient_id": current_user.id, "status": "active"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get doctor details for each subscription
+    doctor_details = []
+    for sub in subscriptions:
+        doctor = await db.doctor_profiles.find_one({"id": sub["doctor_id"]}, {"_id": 0})
+        if doctor:
+            doctor_details.append({
+                "subscription_id": sub["id"],
+                "doctor": doctor,
+                "subscribed_at": sub["subscribed_at"]
+            })
+    
+    return {"subscriptions": doctor_details}
+
+@api_router.delete("/doctors/subscriptions/{subscription_id}")
+async def unsubscribe_from_doctor(subscription_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.doctor_patient_subscriptions.update_one(
+        {"id": subscription_id, "patient_id": current_user.id},
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+    
+    return {"message": "Successfully unsubscribed from doctor"}
+
+@api_router.get("/doctors/patients")
+async def get_my_patients(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can view their patients")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    # Get all active subscriptions
+    subscriptions = await db.doctor_patient_subscriptions.find(
+        {"doctor_id": profile["id"], "status": "active"},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Get patient details
+    patients = []
+    for sub in subscriptions:
+        patient = await db.users.find_one(
+            {"id": sub["patient_id"]},
+            {"_id": 0, "password_hash": 0}
+        )
+        if patient:
+            patients.append({
+                "subscription_id": sub["id"],
+                "patient": {
+                    "id": patient["id"],
+                    "first_name": patient["first_name"],
+                    "last_name": patient["last_name"],
+                    "email": patient["email"],
+                    "birthdate": patient.get("birthdate")
+                },
+                "subscribed_at": sub["subscribed_at"]
+            })
+    
+    return {"patients": patients}
+
+@api_router.get("/doctors/appointments/today")
+async def get_doctor_appointments_today(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can view their appointments")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+    
+    # Get today's date
+    today = datetime.now(timezone.utc).date().isoformat()
+    
+    # Get all appointments for today
+    appointments = await db.appointments.find(
+        {
+            "doctor_id": profile["id"],
+            "appointment_date": today,
+            "status": {"$ne": "cancelled"}
+        },
+        {"_id": 0}
+    ).sort("appointment_time", 1).to_list(100)
+    
+    # Enrich with patient details
+    enriched_appointments = []
+    for apt in appointments:
+        patient = await db.users.find_one(
+            {"id": apt["user_id"]},
+            {"_id": 0, "password_hash": 0}
+        )
+        if patient:
+            enriched_appointments.append({
+                **apt,
+                "patient_name": f"{patient['first_name']} {patient['last_name']}",
+                "patient_email": patient["email"]
+            })
+    
+    return {"appointments": enriched_appointments}
+
+@api_router.get("/doctors/dashboard")
+async def get_doctor_dashboard(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "doctor":
+        raise HTTPException(status_code=403, detail="Only doctors can access doctor dashboard")
+    
+    profile = await db.doctor_profiles.find_one({"user_id": current_user.id}, {"_id": 0})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Doctor profile not found. Please create a profile first.")
+    
+    # Get today's appointments
+    today = datetime.now(timezone.utc).date().isoformat()
+    today_appointments = await db.appointments.find(
+        {
+            "doctor_id": profile["id"],
+            "appointment_date": today,
+            "status": {"$ne": "cancelled"}
+        },
+        {"_id": 0}
+    ).sort("appointment_time", 1).to_list(100)
+    
+    # Enrich appointments with patient details
+    enriched_appointments = []
+    for apt in today_appointments:
+        patient = await db.users.find_one(
+            {"id": apt["user_id"]},
+            {"_id": 0, "password_hash": 0}
+        )
+        if patient:
+            enriched_appointments.append({
+                **apt,
+                "patient_name": f"{patient['first_name']} {patient['last_name']}",
+                "patient_email": patient["email"]
+            })
+    
+    # Get patient count
+    patient_count = await db.doctor_patient_subscriptions.count_documents({
+        "doctor_id": profile["id"],
+        "status": "active"
+    })
+    
+    # Get availability
+    availability = await db.doctor_availability.find(
+        {"doctor_id": profile["id"]},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get upcoming vacations
+    current_date = datetime.now(timezone.utc).date().isoformat()
+    upcoming_vacations = await db.doctor_vacations.find(
+        {
+            "doctor_id": profile["id"],
+            "end_date": {"$gte": current_date}
+        },
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {
+        "profile": profile,
+        "today_appointments": enriched_appointments,
+        "patient_count": patient_count,
+        "availability": availability,
+        "upcoming_vacations": upcoming_vacations
+    }
+
+# ============== RECURRING APPOINTMENTS ==============
+
+@api_router.post("/appointments/recurring")
+async def create_recurring_appointment(request: AddAppointmentRequest, current_user: User = Depends(get_current_user)):
+    if not request.is_recurring or not request.recurrence_interval_weeks or not request.num_occurrences:
+        raise HTTPException(status_code=400, detail="Missing recurring appointment parameters")
+    
+    # Verify doctor exists
+    doctor_profile = await db.doctor_profiles.find_one({"id": request.doctor_id})
+    if not doctor_profile:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    # Get child name if provided
+    child_name = None
+    if request.child_id:
+        child = await db.children.find_one({"id": request.child_id, "parent_id": current_user.id})
+        if child:
+            child_name = f"{child['first_name']} {child['last_name']}"
+    
+    # Create parent appointment
+    parent_appointment = Appointment(
+        user_id=current_user.id,
+        child_id=request.child_id,
+        child_name=child_name,
+        doctor_id=request.doctor_id,
+        appointment_date=request.appointment_date,
+        appointment_time=request.appointment_time,
+        notes=request.notes,
+        is_recurring=True,
+        recurrence_interval_weeks=request.recurrence_interval_weeks
+    )
+    
+    await db.appointments.insert_one(parent_appointment.model_dump())
+    
+    # Create recurring appointments
+    created_appointments = [parent_appointment]
+    base_date = datetime.fromisoformat(request.appointment_date)
+    
+    for i in range(1, request.num_occurrences):
+        next_date = base_date + timedelta(weeks=request.recurrence_interval_weeks * i)
+        
+        recurring_apt = Appointment(
+            user_id=current_user.id,
+            child_id=request.child_id,
+            child_name=child_name,
+            doctor_id=request.doctor_id,
+            appointment_date=next_date.date().isoformat(),
+            appointment_time=request.appointment_time,
+            notes=request.notes,
+            is_recurring=True,
+            recurrence_interval_weeks=request.recurrence_interval_weeks,
+            parent_appointment_id=parent_appointment.id
+        )
+        
+        await db.appointments.insert_one(recurring_apt.model_dump())
+        created_appointments.append(recurring_apt)
+    
+    return {
+        "message": f"Created {len(created_appointments)} recurring appointments",
+        "appointments": created_appointments
+    }
+
+# ============== PRESCRIPTION WARNINGS (SMART NOTIFICATIONS) ==============
+
+@api_router.get("/medications/prescription-warnings")
+async def get_prescription_warnings(current_user: User = Depends(get_current_user)):
+    """
+    Smart endpoint that checks if medications will run out during doctor's vacation
+    and warns patients 1-2 weeks in advance
+    """
+    warnings = []
+    
+    # Get all user's medications
+    medications = await db.medications.find({"user_id": current_user.id}, {"_id": 0}).to_list(100)
+    
+    # Get all subscribed doctors
+    subscriptions = await db.doctor_patient_subscriptions.find(
+        {"patient_id": current_user.id, "status": "active"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    for medication in medications:
+        # Calculate when medication will run out
+        if medication["stock"] <= 0:
+            continue
+        
+        # Estimate days until stock runs out based on frequency
+        # Simplified: assume frequency "2x täglich" means 2 pills per day
+        daily_usage = 1  # Default
+        if "täglich" in medication["frequency"].lower() or "daily" in medication["frequency"].lower():
+            try:
+                parts = medication["frequency"].lower().split("x")
+                if len(parts) > 1:
+                    daily_usage = int(parts[0].strip())
+            except:
+                daily_usage = 1
+        
+        days_until_empty = medication["stock"] / daily_usage if daily_usage > 0 else medication["stock"]
+        runout_date = datetime.now(timezone.utc).date() + timedelta(days=days_until_empty)
+        
+        # Check each subscribed doctor's vacation
+        for sub in subscriptions:
+            doctor_vacations = await db.doctor_vacations.find(
+                {"doctor_id": sub["doctor_id"]},
+                {"_id": 0}
+            ).to_list(100)
+            
+            for vacation in doctor_vacations:
+                vacation_start = datetime.fromisoformat(vacation["start_date"]).date()
+                vacation_end = datetime.fromisoformat(vacation["end_date"]).date()
+                
+                # Check if medication will run out during vacation
+                if vacation_start <= runout_date <= vacation_end:
+                    # Warn 1-2 weeks before
+                    warning_date_2weeks = vacation_start - timedelta(weeks=2)
+                    warning_date_1week = vacation_start - timedelta(weeks=1)
+                    today = datetime.now(timezone.utc).date()
+                    
+                    if warning_date_2weeks <= today <= vacation_start:
+                        # Get doctor details
+                        doctor = await db.doctor_profiles.find_one(
+                            {"id": sub["doctor_id"]},
+                            {"_id": 0}
+                        )
+                        
+                        days_until_vacation = (vacation_start - today).days
+                        
+                        warnings.append({
+                            "medication_id": medication["id"],
+                            "medication_name": medication["name"],
+                            "stock": medication["stock"],
+                            "estimated_runout_date": runout_date.isoformat(),
+                            "doctor_name": doctor["name"] if doctor else "Unknown",
+                            "doctor_id": sub["doctor_id"],
+                            "vacation_start": vacation["start_date"],
+                            "vacation_end": vacation["end_date"],
+                            "days_until_vacation": days_until_vacation,
+                            "severity": "high" if days_until_vacation <= 7 else "medium",
+                            "message": f"ACHTUNG! Ihr Arzt {doctor['name'] if doctor else 'Unknown'} ist ab dem {vacation['start_date']} im Urlaub. "
+                                      f"Ihr Medikament '{medication['name']}' läuft voraussichtlich am {runout_date.isoformat()} aus. "
+                                      f"Bitte holen Sie rechtzeitig ein neues Rezept!"
+                        })
+    
+    return {"warnings": warnings}
+
 app.include_router(api_router)
 
 app.add_middleware(
