@@ -148,7 +148,7 @@ const ChildDashboardPage = () => {
             </TabsTrigger>
             <TabsTrigger value="schedule" data-testid="child-tab-schedule" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              Terminplan
+              Kalender
             </TabsTrigger>
           </TabsList>
 
