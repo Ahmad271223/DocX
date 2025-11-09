@@ -547,6 +547,99 @@ async def update_medication_stock(medication_id: str, stock: int, current_user: 
     
     return {"message": "Stock updated successfully"}
 
+@api_router.post("/medications/{medication_id}/take")
+async def take_medication(medication_id: str, current_user: User = Depends(get_current_user)):
+    # Get medication
+    medication = await db.medications.find_one(
+        {"id": medication_id, "user_id": current_user.id},
+        {"_id": 0}
+    )
+    
+    if not medication:
+        raise HTTPException(status_code=404, detail="Medication not found")
+    
+    # Decrease stock by 1
+    new_stock = max(0, medication["stock"] - 1)
+    
+    await db.medications.update_one(
+        {"id": medication_id},
+        {"$set": {
+            "stock": new_stock,
+            "last_taken": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Record intake
+    intake = MedicationIntake(
+        user_id=current_user.id,
+        medication_id=medication_id
+    )
+    
+    await db.medication_intakes.insert_one(intake.model_dump())
+    
+    # Check if stock is low (5, 3, or 1)
+    warning = None
+    if new_stock <= 1:
+        warning = "Kritisch! Nur noch 1 Tablette übrig!"
+    elif new_stock <= 3:
+        warning = "Achtung! Nur noch 3 Tabletten übrig!"
+    elif new_stock <= 5:
+        warning = "Hinweis: Nur noch 5 Tabletten übrig!"
+    
+    return {
+        "message": "Medication taken successfully",
+        "new_stock": new_stock,
+        "warning": warning
+    }
+
+@api_router.post("/medications/scan-prescription")
+async def scan_prescription(request: ScanPrescriptionRequest, current_user: User = Depends(get_current_user)):
+    # Mock OCR processing - in production, use OCR service
+    # For now, return mock data
+    return {
+        "success": True,
+        "message": "Rezept erfolgreich gescannt",
+        "extracted_data": {
+            "medication_name": "Beispiel Medikament",
+            "dosage": "500mg",
+            "quantity": "20 Tabletten",
+            "prescription_number": "RX-" + str(uuid.uuid4())[:8]
+        }
+    }
+
+@api_router.post("/medications/scan-barcode")
+async def scan_barcode(request: ScanBarcodeRequest, current_user: User = Depends(get_current_user)):
+    # Mock barcode lookup - in production, use medication database API
+    return {
+        "success": True,
+        "message": "Barcode erfolgreich gescannt",
+        "medication_data": {
+            "name": "Medikament (Code: " + request.barcode + ")",
+            "dosage": "Nicht verfügbar",
+            "manufacturer": "Demo Pharma",
+            "barcode": request.barcode
+        }
+    }
+
+@api_router.get("/medications/{medication_id}/reminders")
+async def get_medication_reminders(medication_id: str, current_user: User = Depends(get_current_user)):
+    medication = await db.medications.find_one(
+        {"id": medication_id, "user_id": current_user.id},
+        {"_id": 0}
+    )
+    
+    if not medication:
+        raise HTTPException(status_code=404, detail="Medication not found")
+    
+    # Return upcoming reminders based on frequency_times
+    return {
+        "medication_id": medication_id,
+        "medication_name": medication["name"],
+        "reminder_enabled": medication.get("reminder_enabled", True),
+        "frequency_times": medication.get("frequency_times", []),
+        "next_reminder": medication.get("frequency_times", [""])[0] if medication.get("frequency_times") else None
+    }
+
 # ============== PHARMACY ENDPOINTS ==============
 
 @api_router.get("/pharmacies")
