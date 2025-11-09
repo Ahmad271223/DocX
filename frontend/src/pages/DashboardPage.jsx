@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Heart, Pill, Calendar, Users, Activity, LogOut, Plus, CalendarDays, Trash2, CalendarRange } from "lucide-react";
 import AddMedicationModal from "@/components/AddMedicationModal";
 import AddChildModal from "@/components/AddChildModal";
-import AddAppointmentModal from "@/components/AddAppointmentModal";
 import AddVitalSignsModal from "@/components/AddVitalSignsModal";
 import TakeMedicationButton from "@/components/TakeMedicationButton";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
