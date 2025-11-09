@@ -63,6 +63,22 @@ const DashboardPage = () => {
     toast.success("Erfolgreich abgemeldet");
   };
 
+  const handleDeleteMedication = async (medicationId) => {
+    if (!window.confirm("Möchten Sie dieses Medikament wirklich löschen?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/medications/${medicationId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Medikament gelöscht!");
+      fetchData();
+    } catch (error) {
+      toast.error("Fehler beim Löschen");
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20" data-testid="dashboard-page">
       {/* Navbar */}
