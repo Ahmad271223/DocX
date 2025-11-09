@@ -456,6 +456,7 @@ async def login(request: LoginRequest):
             "email": user_doc["email"],
             "first_name": user_doc["first_name"],
             "last_name": user_doc["last_name"],
+            "user_type": user_doc.get("user_type", "patient"),
             "subscription_status": user_doc["subscription_status"]
         }
     }
