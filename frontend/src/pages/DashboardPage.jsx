@@ -171,6 +171,10 @@ const DashboardPage = () => {
             </TabsTrigger>
             <TabsTrigger value="schedule" data-testid="tab-schedule" className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
+              Terminplan
+            </TabsTrigger>
+            <TabsTrigger value="weekly" data-testid="tab-weekly" className="flex items-center gap-2">
+              <CalendarRange className="w-4 h-4" />
               Wochenplan
             </TabsTrigger>
           </TabsList>
