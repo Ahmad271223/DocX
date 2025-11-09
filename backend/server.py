@@ -207,6 +207,23 @@ class CheckoutRequest(BaseModel):
     num_children: int
     user_email: str
 
+class TakeMedicationRequest(BaseModel):
+    medication_id: str
+
+class ScanPrescriptionRequest(BaseModel):
+    image_data: str  # Base64 encoded image
+
+class ScanBarcodeRequest(BaseModel):
+    barcode: str
+
+class AddScheduleEntryRequest(BaseModel):
+    day_of_week: int
+    start_time: str
+    end_time: str
+    title: str
+    description: Optional[str] = None
+    color: str = "#14b8a6"
+
 # ============== HELPER FUNCTIONS ==============
 
 def hash_password(password: str) -> str:
