@@ -128,99 +128,123 @@ user_problem_statement: |
 backend:
   - task: "User-Type (patient/doctor) hinzufügen"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "User-Model erweitert mit user_type field (patient/doctor). Registrierung und Login aktualisiert."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: User registration with user_type='doctor' and user_type='patient' works correctly. Doctors automatically get subscription_status='active'. All authentication endpoints working properly."
   
   - task: "DoctorProfile Model und CRUD Endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "DoctorProfile Model mit allen Details erstellt. Endpoints: POST/GET/PUT /api/doctors/profile, GET /api/doctors/search, GET /api/doctors/{id}/profile"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All doctor profile CRUD operations working. POST /api/doctors/profile creates profile, GET retrieves own profile, PUT updates profile, GET /api/doctors/{id}/profile gets public profile, GET /api/doctors/search searches by specialty/city. Authorization properly enforced (only doctors can create profiles)."
   
   - task: "DoctorAvailability Model und Endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "DoctorAvailability Model für wöchentliche Verfügbarkeit. Endpoints: POST/GET/DELETE /api/doctors/availability"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Doctor availability management fully functional. POST adds availability (day_of_week, start_time, end_time), GET retrieves own availability, GET /api/doctors/{id}/availability gets public availability, DELETE removes availability. Tested Monday-Friday 09:00-17:00 schedule."
   
   - task: "DoctorVacation Model und Endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "DoctorVacation Model für Urlaubszeiten. Endpoints: POST/GET/DELETE /api/doctors/vacation"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Doctor vacation management working correctly. POST adds vacation periods (start_date, end_date, reason), GET retrieves own vacations, GET /api/doctors/{id}/vacation gets public vacation info, DELETE removes vacation. Tested with 2-week future vacation period."
   
   - task: "Doctor-Patient Subscription System"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "DoctorPatientSubscription Model. Endpoints: POST /api/doctors/{id}/subscribe, GET /api/doctors/my-subscriptions, DELETE /api/doctors/subscriptions/{id}"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Doctor-Patient subscription system fully functional. POST /api/doctors/{id}/subscribe allows patients to subscribe to doctors, GET /api/doctors/my-subscriptions shows patient's subscribed doctors with full doctor details, GET /api/doctors/patients shows doctor's patients, DELETE unsubscribes. Prevents duplicate subscriptions."
   
   - task: "Doctor Dashboard und Patient List"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Doctor Dashboard zeigt Profile, heutige Termine, Patientenanzahl, Verfügbarkeit, Urlaub. Endpoints: GET /api/doctors/dashboard, GET /api/doctors/patients, GET /api/doctors/appointments/today"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Doctor dashboard fully functional. GET /api/doctors/dashboard returns complete dashboard with profile, today_appointments, patient_count, availability, upcoming_vacations. GET /api/doctors/appointments/today shows today's appointments with patient details. All data properly enriched and formatted."
   
   - task: "Recurring Appointments"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Appointment Model erweitert mit is_recurring, recurrence_interval_weeks. Endpoint: POST /api/appointments/recurring erstellt mehrere Termine automatisch."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Recurring appointments working perfectly. POST /api/appointments/recurring creates multiple appointments (tested 5 occurrences every 2 weeks). All appointments properly linked with parent_appointment_id, correct date calculations, and recurring flags set. Verified appointments are created and retrievable."
   
   - task: "Smart Prescription Warnings"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Intelligente Logik die prüft ob Medikamente während Arzt-Urlaub auslaufen. Warnt 1-2 Wochen vorher. Endpoint: GET /api/medications/prescription-warnings"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Smart prescription warnings working excellently. GET /api/medications/prescription-warnings correctly calculates medication runout dates based on frequency (e.g., '2x täglich'), checks against subscribed doctors' vacation periods, and generates detailed warnings with severity levels. Tested with medication running out during doctor vacation - warning generated with complete details including German message."
 
 frontend:
 
