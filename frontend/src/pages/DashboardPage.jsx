@@ -352,12 +352,8 @@ const DashboardPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="schedule" data-testid="schedule-content">
-            <DateSchedule children={children} />
-          </TabsContent>
-
-          <TabsContent value="weekly" data-testid="weekly-content">
-            <WeeklyScheduleView children={children} />
+          <TabsContent value="calendar" data-testid="calendar-content">
+            <YearlyCalendar children={children} />
           </TabsContent>
         </Tabs>
       </div>
