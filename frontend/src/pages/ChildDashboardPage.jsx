@@ -286,12 +286,7 @@ const ChildDashboardPage = () => {
         onSuccess={fetchChildDashboard}
         childId={childId}
       />
-      <AddAppointmentModal
-        open={showAppointmentModal}
-        onClose={() => setShowAppointmentModal(false)}
-        onSuccess={fetchChildDashboard}
-        childId={childId}
-      />
+ 
       <AddVitalSignsModal
         open={showVitalSignsModal}
         onClose={() => setShowVitalSignsModal(false)}
