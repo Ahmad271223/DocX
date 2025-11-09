@@ -21,9 +21,7 @@ const DashboardPage = () => {
   const { user, logout, token } = useContext(AuthContext);
   const [medications, setMedications] = useState([]);
   const [children, setChildren] = useState([]);
-  const [appointments, setAppointments] = useState([]);
   const [vitalSigns, setVitalSigns] = useState([]);
-  const [pharmacies, setPharmacies] = useState([]);
   
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [showChildModal, setShowChildModal] = useState(false);
