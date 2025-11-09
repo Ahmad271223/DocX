@@ -222,7 +222,14 @@ const DashboardPage = () => {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {medications.map(med => (
-                    <MedicationCard key={med.id} medication={med} onTaken={fetchData} onDelete={handleDeleteMedication} />
+                    <MedicationCard 
+                      key={med.id} 
+                      medication={med} 
+                      onTaken={fetchData} 
+                      deleteMode={deleteMode}
+                      isSelected={selectedMedications.includes(med.id)}
+                      onToggleSelect={toggleMedicationSelection}
+                    />
                   ))}
                 </div>
               )}
