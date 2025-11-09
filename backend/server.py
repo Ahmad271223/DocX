@@ -252,6 +252,15 @@ class AddScheduleEntryRequest(BaseModel):
     description: Optional[str] = None
     child_id: Optional[str] = None
 
+class AddRecurringScheduleRequest(BaseModel):
+    day_of_week: int  # 0-6
+    start_hour: int  # 0-23
+    end_hour: int  # 0-23
+    title: str
+    category: str = "other"
+    description: Optional[str] = None
+    child_id: Optional[str] = None
+
 # ============== HELPER FUNCTIONS ==============
 
 def hash_password(password: str) -> str:
