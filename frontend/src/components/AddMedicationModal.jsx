@@ -6,18 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Camera, Scan, Plus, X } from "lucide-react";
+import ScanPrescriptionModal from "./ScanPrescriptionModal";
+import ScanBarcodeModal from "./ScanBarcodeModal";
 
 const AddMedicationModal = ({ open, onClose, onSuccess }) => {
   const { token } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     dosage: "",
     frequency: "",
+    frequency_times: [],
     stock: "",
     expiry_date: "",
-    prescription_number: ""
+    prescription_number: "",
+    barcode: "",
+    reminder_enabled: true
   });
+  const [newTime, setNewTime] = useState("08:00");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
