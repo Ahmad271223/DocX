@@ -59,6 +59,7 @@ function App() {
           <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <RegisterPage />} />
           <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <LoginPage />} />
           <Route path="/dashboard" element={token ? <DashboardPage /> : <Navigate to="/login" />} />
+          <Route path="/child/:childId" element={token ? <ChildDashboardPage /> : <Navigate to="/login" />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancel" element={<PaymentCancelPage />} />
         </Routes>
