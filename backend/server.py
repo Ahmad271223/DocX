@@ -108,6 +108,8 @@ class Appointment(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
+    child_id: Optional[str] = None
+    child_name: Optional[str] = None
     doctor_id: str
     appointment_date: str
     appointment_time: str
