@@ -270,6 +270,9 @@ class AddAppointmentRequest(BaseModel):
     appointment_time: str
     notes: Optional[str] = None
     child_id: Optional[str] = None
+    is_recurring: bool = False
+    recurrence_interval_weeks: Optional[int] = None
+    num_occurrences: Optional[int] = None  # How many recurring appointments to create
 
 class AddVitalSignsRequest(BaseModel):
     pulse: Optional[int] = None
