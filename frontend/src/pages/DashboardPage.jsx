@@ -283,7 +283,7 @@ const DashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="schedule" data-testid="schedule-content">
-            <WeeklySchedule />
+            <DateSchedule children={children} />
           </TabsContent>
         </Tabs>
       </div>
