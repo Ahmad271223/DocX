@@ -241,6 +241,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     num_children: int = 0
+    user_type: str = "patient"  # patient or doctor
 
 class LoginRequest(BaseModel):
     email: EmailStr
