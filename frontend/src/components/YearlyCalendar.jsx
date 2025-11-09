@@ -327,6 +327,11 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
                   ))}
                 </SelectContent>
               </Select>
+              {formData.category === 'doctor' && (
+                <p className="text-xs text-gray-600 mt-2">
+                  🚨 Arzttermine werden 2 Tage vorher als Erinnerung angezeigt
+                </p>
+              )}
             </div>
             
             <div>
