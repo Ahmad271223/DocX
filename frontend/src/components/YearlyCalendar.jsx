@@ -36,7 +36,9 @@ const YearlyCalendar = ({ children = [], selectedChild = null }) => {
     title: '',
     category: 'other',
     description: '',
-    child_id: selectedChild || ''
+    child_id: selectedChild || '',
+    recurrence: 'once', // once, weekly-2, weekly-4, forever
+    recurrence_count: 1
   });
 
   useEffect(() => {
