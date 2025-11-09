@@ -198,6 +198,7 @@ class AddMedicationRequest(BaseModel):
     barcode: Optional[str] = None
     prescription_image: Optional[str] = None
     reminder_enabled: bool = True
+    child_id: Optional[str] = None
 
 class AddAppointmentRequest(BaseModel):
     doctor_id: str
