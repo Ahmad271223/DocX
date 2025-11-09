@@ -209,6 +209,64 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
               className="mt-1"
             />
           </div>
+          
+          <div>
+            <Label htmlFor="barcode">Barcode (optional)</Label>
+            <Input
+              id="barcode"
+              name="barcode"
+              data-testid="medication-barcode-input"
+              value={formData.barcode}
+              onChange={handleChange}
+              placeholder="Optional"
+              className="mt-1"
+            />
+          </div>
+          
+          <div>
+            <Label>Erinnerungszeiten</Label>
+            <div className="mt-2 space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  type="time"
+                  value={newTime}
+                  onChange={(e) => setNewTime(e.target.value)}
+                  data-testid="medication-time-input"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddTime}
+                  data-testid="add-time-btn"
+                  className="bg-teal-500 hover:bg-teal-600 text-white"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              {formData.frequency_times.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.frequency_times.map(time => (
+                    <div
+                      key={time}
+                      className="flex items-center gap-2 bg-teal-100 text-teal-700 px-3 py-1 rounded-full"
+                    >
+                      <span>{time}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTime(time)}
+                        className="hover:text-red-600"
+                        data-testid={`remove-time-${time}`}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          
           <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
@@ -230,6 +288,19 @@ const AddMedicationModal = ({ open, onClose, onSuccess }) => {
         </form>
       </DialogContent>
     </Dialog>
+    
+    <ScanPrescriptionModal
+      open={showPrescriptionModal}
+      onClose={() => setShowPrescriptionModal(false)}
+      onSuccess={handlePrescriptionData}
+    />
+    
+    <ScanBarcodeModal
+      open={showBarcodeModal}
+      onClose={() => setShowBarcodeModal(false)}
+      onSuccess={handleBarcodeData}
+    />
+    </>
   );
 };
 
