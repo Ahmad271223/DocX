@@ -176,17 +176,13 @@ const ChildDashboardPage = () => {
               <Pill className="w-4 h-4" />
               Medikamente
             </TabsTrigger>
-            <TabsTrigger value="appointments" data-testid="child-tab-appointments" className="flex items-center gap-2">
+            <TabsTrigger value="calendar" data-testid="child-tab-calendar" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              Termine
+              Kalender
             </TabsTrigger>
             <TabsTrigger value="vitals" data-testid="child-tab-vitals" className="flex items-center gap-2">
               <Activity className="w-4 h-4" />
               Vitalwerte
-            </TabsTrigger>
-            <TabsTrigger value="schedule" data-testid="child-tab-schedule" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Kalender
             </TabsTrigger>
           </TabsList>
 
