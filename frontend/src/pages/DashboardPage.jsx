@@ -123,6 +123,10 @@ const DashboardPage = () => {
               <Heart className="w-4 h-4" />
               Apotheken
             </TabsTrigger>
+            <TabsTrigger value="schedule" data-testid="tab-schedule" className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4" />
+              Wochenplan
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="medications" data-testid="medications-content">
