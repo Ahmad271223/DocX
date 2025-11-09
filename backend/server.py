@@ -161,6 +161,9 @@ class Appointment(BaseModel):
     appointment_time: str
     status: str = "scheduled"  # scheduled, completed, cancelled
     notes: Optional[str] = None
+    is_recurring: bool = False
+    recurrence_interval_weeks: Optional[int] = None  # e.g., 2 for every 2 weeks, 3 for every 3 weeks
+    parent_appointment_id: Optional[str] = None  # Links to original recurring appointment
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class VitalSigns(BaseModel):
