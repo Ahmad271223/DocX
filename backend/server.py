@@ -96,6 +96,24 @@ class Pharmacy(BaseModel):
     latitude: float
     longitude: float
 
+class DoctorProfile(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # Links to User with user_type="doctor"
+    name: str
+    specialty: str
+    license_number: str
+    address: str
+    city: str
+    postal_code: str
+    phone: str
+    email: EmailStr
+    bio: Optional[str] = None
+    years_of_experience: Optional[int] = None
+    languages: List[str] = []
+    profile_image: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class Doctor(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -104,6 +122,33 @@ class Doctor(BaseModel):
     address: str
     phone: str
     email: EmailStr
+
+class DoctorAvailability(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    doctor_id: str
+    day_of_week: int  # 0=Monday, 6=Sunday
+    start_time: str  # HH:MM format
+    end_time: str  # HH:MM format
+    slot_duration: int = 30  # minutes per appointment slot
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class DoctorVacation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    doctor_id: str
+    start_date: str  # YYYY-MM-DD format
+    end_date: str  # YYYY-MM-DD format
+    reason: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class DoctorPatientSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    doctor_id: str
+    patient_id: str
+    status: str = "active"  # active, cancelled
+    subscribed_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class Appointment(BaseModel):
     model_config = ConfigDict(extra="ignore")
