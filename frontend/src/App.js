@@ -11,6 +11,9 @@ import ChildDashboardPage from "@/pages/ChildDashboardPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 import PaymentCancelPage from "@/pages/PaymentCancelPage";
 import LandingPage from "@/pages/LandingPage";
+import DoctorRegisterPage from "@/pages/DoctorRegisterPage";
+import DoctorLoginPage from "@/pages/DoctorLoginPage";
+import DoctorDashboardPage from "@/pages/DoctorDashboardPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
