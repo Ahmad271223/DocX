@@ -316,11 +316,6 @@ const DashboardPage = () => {
         onClose={() => setShowChildModal(false)}
         onSuccess={fetchData}
       />
-      <AddAppointmentModal
-        open={showAppointmentModal}
-        onClose={() => setShowAppointmentModal(false)}
-        onSuccess={fetchData}
-      />
       <AddVitalSignsModal
         open={showVitalSignsModal}
         onClose={() => setShowVitalSignsModal(false)}
