@@ -220,12 +220,13 @@ class ScanBarcodeRequest(BaseModel):
     barcode: str
 
 class AddScheduleEntryRequest(BaseModel):
-    day_of_week: int
-    start_time: str
-    end_time: str
+    date: str  # YYYY-MM-DD
+    time: str  # HH:MM
+    end_time: Optional[str] = None  # HH:MM, optional
     title: str
+    category: str = "other"  # food, sport, doctor, other
     description: Optional[str] = None
-    color: str = "#14b8a6"
+    child_id: Optional[str] = None
 
 # ============== HELPER FUNCTIONS ==============
 
