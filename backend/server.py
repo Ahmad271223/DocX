@@ -121,6 +121,8 @@ class VitalSigns(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
+    child_id: Optional[str] = None
+    child_name: Optional[str] = None
     pulse: Optional[int] = None
     blood_pressure: Optional[str] = None
     temperature: Optional[float] = None
