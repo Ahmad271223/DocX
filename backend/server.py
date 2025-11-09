@@ -814,15 +814,24 @@ async def update_schedule_entry(
     request: AddScheduleEntryRequest,
     current_user: User = Depends(get_current_user)
 ):
+    child_name = None
+    if request.child_id:
+        child = await db.children.find_one({"id": request.child_id, "parent_id": current_user.id})
+        if child:
+            child_name = f"{child['first_name']} {child['last_name']}"
+    
     result = await db.weekly_schedule.update_one(
         {"id": entry_id, "user_id": current_user.id},
         {"$set": {
-            "day_of_week": request.day_of_week,
-            "start_time": request.start_time,
+            "child_id": request.child_id,
+            "child_name": child_name,
+            "date": request.date,
+            "time": request.time,
             "end_time": request.end_time,
             "title": request.title,
+            "category": request.category,
             "description": request.description,
-            "color": request.color
+            "color": get_category_color(request.category)
         }}
     )
     
@@ -830,6 +839,61 @@ async def update_schedule_entry(
         raise HTTPException(status_code=404, detail="Schedule entry not found")
     
     return {"message": "Schedule entry updated successfully"}
+
+@api_router.get("/appointments/upcoming")
+async def get_upcoming_appointments(current_user: User = Depends(get_current_user)):
+    # Get appointments in the next 2 days
+    today = datetime.now(timezone.utc).date()
+    two_days_later = today + timedelta(days=2)
+    
+    # Get schedule entries that are doctor appointments in the next 2 days
+    schedule_entries = await db.weekly_schedule.find(
+        {
+            "user_id": current_user.id,
+            "category": "doctor",
+            "date": {
+                "$gte": today.isoformat(),
+                "$lte": two_days_later.isoformat()
+            }
+        },
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get regular appointments
+    appointments = await db.appointments.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Combine and sort
+    all_appointments = []
+    
+    for entry in schedule_entries:
+        all_appointments.append({
+            "type": "schedule",
+            "id": entry["id"],
+            "title": entry["title"],
+            "date": entry["date"],
+            "time": entry["time"],
+            "description": entry.get("description"),
+            "child_name": entry.get("child_name")
+        })
+    
+    for apt in appointments:
+        apt_date = datetime.fromisoformat(apt["appointment_date"]).date()
+        if today <= apt_date <= two_days_later:
+            all_appointments.append({
+                "type": "appointment",
+                "id": apt["id"],
+                "title": f"Arzttermin",
+                "date": apt["appointment_date"],
+                "time": apt["appointment_time"],
+                "notes": apt.get("notes")
+            })
+    
+    all_appointments.sort(key=lambda x: (x["date"], x["time"]))
+    
+    return {"upcoming_appointments": all_appointments}
 
 app.include_router(api_router)
 
