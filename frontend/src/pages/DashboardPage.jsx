@@ -27,7 +27,6 @@ const DashboardPage = () => {
   
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [showChildModal, setShowChildModal] = useState(false);
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
   const [childrenData, setChildrenData] = useState({ children: [], max_children: 0, can_add_more: true });
   const [deleteMode, setDeleteMode] = useState(false);
