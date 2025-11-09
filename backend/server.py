@@ -324,12 +324,16 @@ class AddRecurringScheduleRequest(BaseModel):
     child_id: Optional[str] = None
 
 class CreateDoctorProfileRequest(BaseModel):
+    practice_name: str
+    practice_address: str
+    practice_city: str
+    practice_postal_code: str
+    practice_phone: str
+    practice_email: EmailStr
+    doctor_names: List[str]
     specialty: str
     license_number: str
-    address: str
-    city: str
-    postal_code: str
-    phone: str
+    license_document: Optional[str] = None
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: List[str] = []
