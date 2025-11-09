@@ -1208,7 +1208,11 @@ async def search_doctors(
     if specialty:
         query["specialty"] = {"$regex": specialty, "$options": "i"}
     if city:
-        query["city"] = {"$regex": city, "$options": "i"}
+        # Search in both practice_city and legacy city field
+        query["$or"] = [
+            {"practice_city": {"$regex": city, "$options": "i"}},
+            {"city": {"$regex": city, "$options": "i"}}
+        ]
     
     doctors = await db.doctor_profiles.find(query, {"_id": 0}).to_list(100)
     return {"doctors": doctors}
