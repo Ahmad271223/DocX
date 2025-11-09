@@ -339,12 +339,16 @@ class CreateDoctorProfileRequest(BaseModel):
     languages: List[str] = []
 
 class UpdateDoctorProfileRequest(BaseModel):
+    practice_name: Optional[str] = None
+    practice_address: Optional[str] = None
+    practice_city: Optional[str] = None
+    practice_postal_code: Optional[str] = None
+    practice_phone: Optional[str] = None
+    practice_email: Optional[EmailStr] = None
+    doctor_names: Optional[List[str]] = None
     specialty: Optional[str] = None
     license_number: Optional[str] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    postal_code: Optional[str] = None
-    phone: Optional[str] = None
+    license_document: Optional[str] = None
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: Optional[List[str]] = None
