@@ -25,6 +25,8 @@ const DoctorAvailabilityManager = ({ token, doctorId, onUpdate }) => {
     day_of_week: 0,
     start_time: "09:00",
     end_time: "17:00",
+    break_start: "",
+    break_end: "",
     slot_duration: 30,
   });
 
