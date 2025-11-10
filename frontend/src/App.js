@@ -79,6 +79,7 @@ function App() {
           
           {/* Patient Routes */}
           <Route path="/doctor-search" element={token && user?.user_type !== "doctor" ? <DoctorSearchPage /> : <Navigate to="/login" />} />
+          <Route path="/doctor-profile/:doctorId" element={token && user?.user_type !== "doctor" ? <DoctorProfileViewPage /> : <Navigate to="/login" />} />
           <Route path="/book-appointment/:doctorId" element={token && user?.user_type !== "doctor" ? <BookAppointmentPage /> : <Navigate to="/login" />} />
           
           {/* Family Routes */}
