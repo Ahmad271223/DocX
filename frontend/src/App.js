@@ -15,6 +15,7 @@ import DoctorRegisterPage from "@/pages/DoctorRegisterPage";
 import DoctorLoginPage from "@/pages/DoctorLoginPage";
 import DoctorDashboardPage from "@/pages/DoctorDashboardPage";
 import DoctorSearchPage from "@/pages/DoctorSearchPage";
+import DoctorProfileViewPage from "@/pages/DoctorProfileViewPage";
 import BookAppointmentPage from "@/pages/BookAppointmentPage";
 import FamilyConnectionsPage from "@/pages/FamilyConnectionsPage";
 import FamilyMemberMedicationsPage from "@/pages/FamilyMemberMedicationsPage";
