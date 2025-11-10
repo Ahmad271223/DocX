@@ -245,6 +245,42 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Smart prescription warnings working excellently. GET /api/medications/prescription-warnings correctly calculates medication runout dates based on frequency (e.g., '2x täglich'), checks against subscribed doctors' vacation periods, and generates detailed warnings with severity levels. Tested with medication running out during doctor vacation - warning generated with complete details including German message."
+  
+  - task: "Familie-Verbindungs-System Backend"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "FamilyConnection Model mit bidirektionalen Verbindungen. Endpoints: GET /api/family/my-code (eigener Code), POST /api/family/connect (über Code verbinden), GET /api/family/connections (Verbindungen abrufen), DELETE /api/family/connections/{id} (Verbindung entfernen)"
+  
+  - task: "Familie-Daten-Zugriff Backend"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoints zum Abrufen von Daten verbundener Nutzer: GET /api/family/member/{id}/medications, GET /api/family/member/{id}/appointments. Prüft Verbindung vor Zugriff."
+  
+  - task: "Notfall-Medikamentensuche Backend"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/emergency/find-medication durchsucht eigene und Familien-Medikamente nach Name, zeigt wer welches Medikament mit Vorrat > 0 hat, inkl. Kontaktdaten"
 
 frontend:
   - task: "Landing Page Footer mit Arzt-Link"
