@@ -774,11 +774,11 @@ def test_authorization_security():
 
 def run_comprehensive_test_scenarios():
     """Run the comprehensive test scenarios as specified in German requirements"""
-    print("🚀 Starting Comprehensive Backend Tests for Extended Medication App - Doctor Module")
+    print("🚀 Starting Comprehensive Backend Tests for Extended Medication App - ALL PHASES")
     print("=" * 80)
     
-    # Scenario 1: Doctor Workflow
-    print("\n📋 SCENARIO 1: Doctor Workflow")
+    # PHASE 1: Doctor Module (Re-test everything)
+    print("\n📋 PHASE 1: DOCTOR MODULE - COMPLETE RE-TEST")
     doctor_token, doctor_id, patient_token, patient_id = test_user_registration_with_types()
     
     if not doctor_token:
@@ -793,18 +793,28 @@ def run_comprehensive_test_scenarios():
     
     availability_ids = test_doctor_availability(doctor_token, profile_id)
     vacation_ids = test_doctor_vacation(doctor_token, profile_id)
-    test_doctor_dashboard(doctor_token)
     
-    # Scenario 2: Patient Workflow
-    print("\n📋 SCENARIO 2: Patient Workflow")
+    # Patient-Doctor Interaction
+    subscription_id = None
     if patient_token:
         subscription_id = test_doctor_patient_subscriptions(doctor_token, patient_token, profile_id)
+        test_doctor_dashboard(doctor_token)
         test_recurring_appointments(patient_token, profile_id)
-        test_smart_prescription_warnings(patient_token, profile_id)
+        test_smart_prescription_warnings(patient_token, doctor_token, profile_id)
     
-    # Scenario 3: Security & Authorization
-    print("\n📋 SCENARIO 3: Security & Authorization")
+    # PHASE 2: Family & Emergency Module (NEW)
+    print("\n📋 PHASE 2: FAMILY & EMERGENCY MODULE - NEW FEATURES")
+    if patient_token and patient_id:
+        patient2_token, patient2_id = test_family_connection_system(patient_token, patient_id)
+        
+        if patient2_token and patient2_id:
+            test_family_data_access(patient_token, patient2_token, patient_id, patient2_id)
+            test_emergency_medication_search(patient_token, patient2_token)
+    
+    # PHASE 3: Security & Authorization (Complete)
+    print("\n📋 PHASE 3: SECURITY & AUTHORIZATION - COMPLETE TESTING")
     test_authorization_security()
+    test_authorization_family_access()
     
     # Final cleanup test - unsubscribe
     if patient_token and subscription_id:
