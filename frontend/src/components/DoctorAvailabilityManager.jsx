@@ -204,9 +204,23 @@ const DoctorAvailabilityManager = ({ token, doctorId, onUpdate }) => {
                   <p className="font-semibold text-gray-800">
                     {DAYS.find((d) => d.value === item.day_of_week)?.label}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    {item.start_time} - {item.end_time} Uhr
-                  </p>
+                  {item.break_start && item.break_end ? (
+                    <>
+                      <p className="text-sm text-gray-600">
+                        {item.start_time} - {item.break_start} Uhr
+                      </p>
+                      <p className="text-xs text-orange-600">
+                        Pause: {item.break_start} - {item.break_end} Uhr
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {item.break_end} - {item.end_time} Uhr
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-600">
+                      {item.start_time} - {item.end_time} Uhr
+                    </p>
+                  )}
                   <p className="text-xs text-gray-500">Termin-Dauer: {item.slot_duration} Minuten</p>
                 </div>
                 <Button
