@@ -171,6 +171,10 @@ const DashboardPage = () => {
               <Pill className="w-4 h-4" />
               Medikamente
             </TabsTrigger>
+            <TabsTrigger value="appointments" data-testid="tab-appointments" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Termine
+            </TabsTrigger>
             <TabsTrigger value="calendar" data-testid="tab-calendar" className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
               Kalender
