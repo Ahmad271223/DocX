@@ -80,11 +80,27 @@ const UpcomingAppointments = () => {
                 day: 'numeric' 
               });
 
+              const doctor = apt.doctor_id ? doctorDetails[apt.doctor_id] : null;
+              
               return (
                 <div key={apt.id} className="bg-white rounded-lg p-3 border border-orange-200">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-semibold text-gray-800">{apt.title}</p>
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1">
+                      {doctor ? (
+                        <>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Stethoscope className="w-4 h-4 text-teal-600" />
+                            <p className="font-semibold text-gray-800">{doctor.practice_name || doctor.name}</p>
+                          </div>
+                          <p className="text-xs text-gray-500 mb-1">{doctor.specialty}</p>
+                          <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                            <MapPin className="w-3 h-3" />
+                            <span>{doctor.practice_city || doctor.city}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <p className="font-semibold text-gray-800 mb-2">{apt.title}</p>
+                      )}
                       <p className="text-sm text-gray-600">{formattedDate}</p>
                       <p className="text-sm text-orange-600 font-semibold">Uhrzeit: {apt.time}</p>
                       {apt.child_name && (
@@ -97,6 +113,14 @@ const UpcomingAppointments = () => {
                         <p className="text-sm text-gray-500 mt-1">{apt.notes}</p>
                       )}
                     </div>
+                    <Button
+                      onClick={() => handleCancelAppointment(apt.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               );
