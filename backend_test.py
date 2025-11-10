@@ -436,7 +436,7 @@ def test_recurring_appointments(patient_token, profile_id):
     else:
         results.log_failure("Recurring appointments verification", f"Status: {response.status_code if response else 'No response'}")
 
-def test_smart_prescription_warnings(patient_token, profile_id):
+def test_smart_prescription_warnings(patient_token, doctor_token, profile_id):
     """Test 8: Smart Prescription Warnings"""
     print("\n🧪 Testing Smart Prescription Warnings...")
     
@@ -461,12 +461,21 @@ def test_smart_prescription_warnings(patient_token, profile_id):
         return
     
     # Add doctor vacation that overlaps with medication runout
-    # Medication will run out in ~10 days, set vacation in 12 days for 7 days
-    vacation_start = (datetime.now() + timedelta(days=12)).date()
+    # Medication will run out in ~10 days, set vacation in 8 days for 7 days
+    vacation_start = (datetime.now() + timedelta(days=8)).date()
     vacation_end = vacation_start + timedelta(days=7)
     
-    # We need doctor token to add vacation, but we'll use the existing doctor
-    # For this test, we'll just test the warning endpoint
+    vacation_data = {
+        "start_date": vacation_start.isoformat(),
+        "end_date": vacation_end.isoformat(),
+        "reason": "Test vacation for prescription warning"
+    }
+    
+    response = make_request("POST", "/doctors/vacation", vacation_data, token=doctor_token)
+    if response and response.status_code == 200:
+        results.log_success("Added doctor vacation for prescription warning test")
+    else:
+        results.log_failure("Add doctor vacation for test", f"Status: {response.status_code if response else 'No response'}")
     
     # Test Prescription Warnings
     response = make_request("GET", "/medications/prescription-warnings", token=patient_token)
@@ -482,13 +491,238 @@ def test_smart_prescription_warnings(patient_token, profile_id):
             missing_fields = [field for field in required_fields if field not in warning]
             
             if not missing_fields:
-                results.log_success("Smart prescription warnings - Warning structure complete")
+                results.log_success("Smart prescription warnings - Warning structure complete with German message")
+                print(f"   📋 Warning message: {warning.get('message', 'N/A')}")
             else:
                 results.log_failure("Warning structure", f"Missing fields: {missing_fields}")
         else:
-            results.log_success("Smart prescription warnings - No warnings (expected if no vacation overlap)")
+            results.log_success("Smart prescription warnings - No warnings (may need subscription to doctor)")
     else:
         results.log_failure("Smart prescription warnings", f"Status: {response.status_code if response else 'No response'}")
+
+def test_family_connection_system(patient_token, patient_id):
+    """Test 9: Family Connection System (Phase 2)"""
+    print("\n🧪 Testing Family Connection System...")
+    
+    # Create second patient for family connection
+    patient2_data = {
+        "first_name": "Klaus",
+        "last_name": "Weber",
+        "birthdate": "1985-07-10",
+        "state": "München",
+        "city": "München",
+        "address": "Familienstraße 789",
+        "postal_code": "80331",
+        "email": f"klaus.weber.{uuid.uuid4().hex[:8]}@test.de",
+        "password": "SecurePass123!",
+        "user_type": "patient",
+        "num_children": 0
+    }
+    
+    response = make_request("POST", "/auth/register", patient2_data)
+    if response and response.status_code == 200:
+        patient2_token = response.json().get("token")
+        patient2_id = response.json().get("user", {}).get("id")
+        results.log_success("Created second patient for family connection test")
+    else:
+        results.log_failure("Create second patient", f"Status: {response.status_code if response else 'No response'}")
+        return None, None
+    
+    # Test 1: Get own family connection code
+    response = make_request("GET", "/family/my-code", token=patient_token)
+    if response and response.status_code == 200:
+        data = response.json()
+        connection_code = data.get("connection_code")
+        if connection_code:
+            results.log_success("GET /api/family/my-code - Get own connection code")
+        else:
+            results.log_failure("Get connection code", "No connection_code in response")
+            return patient2_token, patient2_id
+    else:
+        results.log_failure("Get connection code", f"Status: {response.status_code if response else 'No response'}")
+        return patient2_token, patient2_id
+    
+    # Test 2: Connect via code
+    connect_data = {
+        "connection_code": connection_code,
+        "nickname": "Anna (Schwester)",
+        "relationship": "Schwester"
+    }
+    
+    response = make_request("POST", "/family/connect", connect_data, token=patient2_token)
+    if response and response.status_code == 200:
+        connection_id = response.json().get("connection", {}).get("id")
+        results.log_success("POST /api/family/connect - Connect via code")
+    else:
+        results.log_failure("Connect via code", f"Status: {response.status_code if response else 'No response'}")
+        return patient2_token, patient2_id
+    
+    # Test 3: Get family connections
+    response = make_request("GET", "/family/connections", token=patient2_token)
+    if response and response.status_code == 200:
+        data = response.json()
+        connections = data.get("connections", [])
+        if len(connections) > 0:
+            results.log_success("GET /api/family/connections - Get family connections")
+        else:
+            results.log_failure("Get family connections", "No connections found")
+    else:
+        results.log_failure("Get family connections", f"Status: {response.status_code if response else 'No response'}")
+    
+    # Test 4: Remove family connection
+    if connection_id:
+        response = make_request("DELETE", f"/family/connections/{connection_id}", token=patient2_token)
+        if response and response.status_code == 200:
+            results.log_success("DELETE /api/family/connections/{id} - Remove connection")
+        else:
+            results.log_failure("Remove connection", f"Status: {response.status_code if response else 'No response'}")
+    
+    return patient2_token, patient2_id
+
+def test_family_data_access(patient_token, patient2_token, patient_id, patient2_id):
+    """Test 10: Family Data Access"""
+    print("\n🧪 Testing Family Data Access...")
+    
+    # First, reconnect the family members
+    response = make_request("GET", "/family/my-code", token=patient_token)
+    if response and response.status_code == 200:
+        connection_code = response.json().get("connection_code")
+        
+        connect_data = {
+            "connection_code": connection_code,
+            "nickname": "Anna (Familie)",
+            "relationship": "Familie"
+        }
+        
+        response = make_request("POST", "/family/connect", connect_data, token=patient2_token)
+        if response and response.status_code == 200:
+            results.log_success("Reconnected family members for data access test")
+        else:
+            results.log_failure("Reconnect family", f"Status: {response.status_code if response else 'No response'}")
+            return
+    else:
+        results.log_failure("Get connection code for reconnect", f"Status: {response.status_code if response else 'No response'}")
+        return
+    
+    # Add medication to patient 1
+    medication_data = {
+        "name": "Ibuprofen 400mg",
+        "dosage": "400mg",
+        "frequency": "3x täglich",
+        "frequency_times": ["08:00", "14:00", "20:00"],
+        "stock": 30,
+        "expiry_date": (datetime.now() + timedelta(days=180)).date().isoformat(),
+        "prescription_number": f"RX-{uuid.uuid4().hex[:8]}",
+        "reminder_enabled": True
+    }
+    
+    response = make_request("POST", "/medications", medication_data, token=patient_token)
+    if response and response.status_code == 200:
+        results.log_success("Added medication to patient 1 for family access test")
+    else:
+        results.log_failure("Add medication for family test", f"Status: {response.status_code if response else 'No response'}")
+    
+    # Test 1: Access family member's medications
+    response = make_request("GET", f"/family/member/{patient_id}/medications", token=patient2_token)
+    if response and response.status_code == 200:
+        data = response.json()
+        medications = data.get("medications", [])
+        if len(medications) > 0:
+            results.log_success("GET /api/family/member/{id}/medications - Access family member's medications")
+        else:
+            results.log_success("GET /api/family/member/{id}/medications - Endpoint working (no medications)")
+    else:
+        results.log_failure("Access family medications", f"Status: {response.status_code if response else 'No response'}")
+    
+    # Test 2: Access family member's appointments
+    response = make_request("GET", f"/family/member/{patient_id}/appointments", token=patient2_token)
+    if response and response.status_code == 200:
+        data = response.json()
+        appointments = data.get("appointments", [])
+        results.log_success("GET /api/family/member/{id}/appointments - Access family member's appointments")
+    else:
+        results.log_failure("Access family appointments", f"Status: {response.status_code if response else 'No response'}")
+
+def test_emergency_medication_search(patient_token, patient2_token):
+    """Test 11: Emergency Medication Search"""
+    print("\n🧪 Testing Emergency Medication Search...")
+    
+    # Test emergency medication search
+    search_data = {
+        "medication_name": "Ibuprofen"
+    }
+    
+    response = make_request("POST", "/emergency/find-medication", search_data, token=patient2_token)
+    if response and response.status_code == 200:
+        data = response.json()
+        results_found = data.get("results", [])
+        results.log_success("POST /api/emergency/find-medication - Emergency medication search working")
+        
+        # Check if results have proper structure
+        if results_found:
+            result = results_found[0]
+            required_fields = ["user_name", "medication", "contact_info"]
+            missing_fields = [field for field in required_fields if field not in result]
+            
+            if not missing_fields:
+                results.log_success("Emergency search results - Complete result structure")
+            else:
+                results.log_failure("Emergency search structure", f"Missing fields: {missing_fields}")
+        else:
+            results.log_success("Emergency search - No results found (expected if no matching medications)")
+    else:
+        results.log_failure("Emergency medication search", f"Status: {response.status_code if response else 'No response'}")
+
+def test_authorization_family_access():
+    """Test Authorization for Family Access"""
+    print("\n🧪 Testing Family Access Authorization...")
+    
+    # Create two unconnected patients
+    patient1_data = {
+        "first_name": "Test1",
+        "last_name": "User1",
+        "birthdate": "1990-01-01",
+        "state": "Test",
+        "city": "Test",
+        "address": "Test",
+        "postal_code": "12345",
+        "email": f"testuser1.{uuid.uuid4().hex[:8]}@test.de",
+        "password": "TestPass123!",
+        "user_type": "patient",
+        "num_children": 0
+    }
+    
+    patient2_data = {
+        "first_name": "Test2",
+        "last_name": "User2",
+        "birthdate": "1990-01-01",
+        "state": "Test",
+        "city": "Test",
+        "address": "Test",
+        "postal_code": "12345",
+        "email": f"testuser2.{uuid.uuid4().hex[:8]}@test.de",
+        "password": "TestPass123!",
+        "user_type": "patient",
+        "num_children": 0
+    }
+    
+    # Register both patients
+    response1 = make_request("POST", "/auth/register", patient1_data)
+    response2 = make_request("POST", "/auth/register", patient2_data)
+    
+    if response1 and response1.status_code == 200 and response2 and response2.status_code == 200:
+        token1 = response1.json().get("token")
+        token2 = response2.json().get("token")
+        user1_id = response1.json().get("user", {}).get("id")
+        
+        # Try to access user1's data with user2's token (should fail)
+        response = make_request("GET", f"/family/member/{user1_id}/medications", token=token2)
+        if response and response.status_code == 403:
+            results.log_success("Authorization - Cannot access non-connected user's data (403 Forbidden)")
+        else:
+            results.log_failure("Family authorization", f"Expected 403, got {response.status_code if response else 'No response'}")
+    else:
+        results.log_failure("Create test users for family authorization", "Failed to create test users")
 
 def test_authorization_security():
     """Test Authorization and Security"""
