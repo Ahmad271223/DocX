@@ -769,17 +769,23 @@ def test_authorization_security():
         }
         
         response = make_request("POST", "/doctors/profile", profile_data, token=patient_token)
-        if response and response.status_code == 403:
-            results.log_success("Authorization - Patient cannot create doctor profile (403 Forbidden)")
+        if response:
+            if response.status_code == 403:
+                results.log_success("Authorization - Patient cannot create doctor profile (403 Forbidden)")
+            else:
+                results.log_failure("Authorization", f"Expected 403, got {response.status_code}")
         else:
-            results.log_failure("Authorization", f"Expected 403, got {response.status_code if response else 'No response'}")
+            results.log_failure("Authorization", "Request failed - no response received")
         
         # Try to access doctor dashboard as patient (should fail)
         response = make_request("GET", "/doctors/dashboard", token=patient_token)
-        if response and response.status_code == 403:
-            results.log_success("Authorization - Patient cannot access doctor dashboard (403 Forbidden)")
+        if response:
+            if response.status_code == 403:
+                results.log_success("Authorization - Patient cannot access doctor dashboard (403 Forbidden)")
+            else:
+                results.log_failure("Authorization", f"Expected 403, got {response.status_code}")
         else:
-            results.log_failure("Authorization", f"Expected 403, got {response.status_code if response else 'No response'}")
+            results.log_failure("Authorization", "Request failed - no response received")
     else:
         results.log_failure("Create test patient for authorization", f"Status: {response.status_code if response else 'No response'}")
 
