@@ -517,3 +517,28 @@ agent_communication:
       - Smart Warning Test: Medication runout during vacation period ✅
       
       All backend APIs are production-ready. No critical issues found.
+  
+  - agent: "main"
+    message: |
+      Phase 2 Backend implementiert. Bitte teste jetzt ALLE Backend-Endpunkte:
+      
+      Phase 1 (nochmal prüfen):
+      - User Registration & Login
+      - Doctor Profile CRUD
+      - Doctor Availability
+      - Doctor Vacation
+      - Doctor-Patient Subscriptions
+      - Doctor Dashboard
+      - Recurring Appointments
+      - Prescription Warnings
+      
+      Phase 2 (NEU):
+      - Family Connection Code (GET /api/family/my-code)
+      - Family Connect (POST /api/family/connect)
+      - Family Connections List (GET /api/family/connections)
+      - Remove Connection (DELETE /api/family/connections/{id})
+      - Family Member Medications (GET /api/family/member/{id}/medications)
+      - Family Member Appointments (GET /api/family/member/{id}/appointments)
+      - Emergency Medication Search (POST /api/emergency/find-medication)
+      
+      Stelle sicher dass ALLE Tests bestehen (31/31 für Phase 1, alle neuen für Phase 2)
