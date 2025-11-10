@@ -1704,6 +1704,273 @@ async def get_prescription_warnings(current_user: User = Depends(get_current_use
     
     return {"warnings": warnings}
 
+# ============== FAMILY CONNECTION ENDPOINTS ==============
+
+@api_router.get("/family/my-code")
+async def get_my_connection_code(current_user: User = Depends(get_current_user)):
+    """
+    Generate a unique connection code for the user
+    Format: USER-XXXXX (first 8 chars of user ID)
+    """
+    connection_code = f"USER-{current_user.id[:8].upper()}"
+    return {
+        "connection_code": connection_code,
+        "user_id": current_user.id,
+        "name": f"{current_user.first_name} {current_user.last_name}"
+    }
+
+@api_router.post("/family/connect")
+async def connect_family_member(request: ConnectFamilyRequest, current_user: User = Depends(get_current_user)):
+    """
+    Connect with another user using their connection code
+    """
+    # Extract user ID from connection code (format: USER-XXXXXXXX)
+    if not request.connection_code.startswith("USER-"):
+        raise HTTPException(status_code=400, detail="Invalid connection code format")
+    
+    code_part = request.connection_code.replace("USER-", "").lower()
+    
+    # Find user with matching ID prefix
+    all_users = await db.users.find({}, {"_id": 0}).to_list(1000)
+    target_user = None
+    for user in all_users:
+        if user["id"].lower().startswith(code_part):
+            target_user = user
+            break
+    
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User with this connection code not found")
+    
+    if target_user["id"] == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot connect with yourself")
+    
+    # Check if connection already exists
+    existing_connection = await db.family_connections.find_one({
+        "$or": [
+            {"user_id": current_user.id, "connected_user_id": target_user["id"]},
+            {"user_id": target_user["id"], "connected_user_id": current_user.id}
+        ],
+        "status": "active"
+    })
+    
+    if existing_connection:
+        raise HTTPException(status_code=400, detail="Connection already exists")
+    
+    # Create bidirectional connections
+    connection1 = FamilyConnection(
+        user_id=current_user.id,
+        connected_user_id=target_user["id"],
+        connection_code=request.connection_code,
+        status="active",
+        nickname=request.nickname,
+        relationship=request.relationship
+    )
+    
+    connection2 = FamilyConnection(
+        user_id=target_user["id"],
+        connected_user_id=current_user.id,
+        connection_code=request.connection_code,
+        status="active",
+        nickname=f"{current_user.first_name} {current_user.last_name}",
+        relationship=request.relationship
+    )
+    
+    await db.family_connections.insert_one(connection1.model_dump())
+    await db.family_connections.insert_one(connection2.model_dump())
+    
+    return {
+        "message": "Successfully connected",
+        "connection": connection1,
+        "connected_user": {
+            "id": target_user["id"],
+            "name": f"{target_user['first_name']} {target_user['last_name']}",
+            "email": target_user["email"]
+        }
+    }
+
+@api_router.get("/family/connections")
+async def get_family_connections(current_user: User = Depends(get_current_user)):
+    """
+    Get all family connections for the current user
+    """
+    connections = await db.family_connections.find(
+        {"user_id": current_user.id, "status": "active"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with user details
+    enriched_connections = []
+    for conn in connections:
+        connected_user = await db.users.find_one(
+            {"id": conn["connected_user_id"]},
+            {"_id": 0, "password_hash": 0}
+        )
+        if connected_user:
+            enriched_connections.append({
+                "connection_id": conn["id"],
+                "connected_user": {
+                    "id": connected_user["id"],
+                    "first_name": connected_user["first_name"],
+                    "last_name": connected_user["last_name"],
+                    "email": connected_user["email"]
+                },
+                "nickname": conn.get("nickname"),
+                "relationship": conn.get("relationship"),
+                "connected_at": conn["created_at"]
+            })
+    
+    return {"connections": enriched_connections}
+
+@api_router.delete("/family/connections/{connection_id}")
+async def remove_family_connection(connection_id: str, current_user: User = Depends(get_current_user)):
+    """
+    Remove a family connection
+    """
+    # Find the connection
+    connection = await db.family_connections.find_one({
+        "id": connection_id,
+        "user_id": current_user.id
+    })
+    
+    if not connection:
+        raise HTTPException(status_code=404, detail="Connection not found")
+    
+    # Mark as cancelled (bidirectional)
+    await db.family_connections.update_many(
+        {
+            "$or": [
+                {"user_id": current_user.id, "connected_user_id": connection["connected_user_id"]},
+                {"user_id": connection["connected_user_id"], "connected_user_id": current_user.id}
+            ]
+        },
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    return {"message": "Connection removed successfully"}
+
+@api_router.get("/family/member/{member_id}/medications")
+async def get_family_member_medications(member_id: str, current_user: User = Depends(get_current_user)):
+    """
+    Get medications of a connected family member
+    """
+    # Verify connection exists
+    connection = await db.family_connections.find_one({
+        "user_id": current_user.id,
+        "connected_user_id": member_id,
+        "status": "active"
+    })
+    
+    if not connection:
+        raise HTTPException(status_code=403, detail="Not connected to this user")
+    
+    # Get medications
+    medications = await db.medications.find(
+        {"user_id": member_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"medications": medications}
+
+@api_router.get("/family/member/{member_id}/appointments")
+async def get_family_member_appointments(member_id: str, current_user: User = Depends(get_current_user)):
+    """
+    Get appointments of a connected family member
+    """
+    # Verify connection exists
+    connection = await db.family_connections.find_one({
+        "user_id": current_user.id,
+        "connected_user_id": member_id,
+        "status": "active"
+    })
+    
+    if not connection:
+        raise HTTPException(status_code=403, detail="Not connected to this user")
+    
+    # Get appointments
+    appointments = await db.appointments.find(
+        {"user_id": member_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"appointments": appointments}
+
+@api_router.post("/emergency/find-medication")
+async def find_medication_in_network(request: SearchMedicationRequest, current_user: User = Depends(get_current_user)):
+    """
+    Emergency search: Find who in your family network has a specific medication
+    """
+    results = []
+    
+    # Get all family connections
+    connections = await db.family_connections.find(
+        {"user_id": current_user.id, "status": "active"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Search in current user's medications first
+    my_medications = await db.medications.find(
+        {
+            "user_id": current_user.id,
+            "name": {"$regex": request.medication_name, "$options": "i"},
+            "stock": {"$gt": 0}
+        },
+        {"_id": 0}
+    ).to_list(100)
+    
+    for med in my_medications:
+        results.append({
+            "user_id": current_user.id,
+            "user_name": f"{current_user.first_name} {current_user.last_name}",
+            "relationship": "Eigenes Medikament",
+            "medication": {
+                "id": med["id"],
+                "name": med["name"],
+                "dosage": med["dosage"],
+                "stock": med["stock"],
+                "expiry_date": med["expiry_date"]
+            }
+        })
+    
+    # Search in connected users' medications
+    for conn in connections:
+        connected_user = await db.users.find_one(
+            {"id": conn["connected_user_id"]},
+            {"_id": 0, "password_hash": 0}
+        )
+        
+        if not connected_user:
+            continue
+        
+        medications = await db.medications.find(
+            {
+                "user_id": conn["connected_user_id"],
+                "name": {"$regex": request.medication_name, "$options": "i"},
+                "stock": {"$gt": 0}
+            },
+            {"_id": 0}
+        ).to_list(100)
+        
+        for med in medications:
+            results.append({
+                "user_id": conn["connected_user_id"],
+                "user_name": f"{connected_user['first_name']} {connected_user['last_name']}",
+                "relationship": conn.get("relationship", "Verbunden"),
+                "contact_email": connected_user["email"],
+                "medication": {
+                    "id": med["id"],
+                    "name": med["name"],
+                    "dosage": med["dosage"],
+                    "stock": med["stock"],
+                    "expiry_date": med["expiry_date"]
+                }
+            })
+    
+    return {
+        "medication_searched": request.medication_name,
+        "results_count": len(results),
+        "results": results
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
