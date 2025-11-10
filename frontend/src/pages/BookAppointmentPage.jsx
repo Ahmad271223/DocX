@@ -189,34 +189,57 @@ const BookAppointmentPage = () => {
               </select>
             </div>
 
-            {/* Date & Time */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="appointment_date">Datum *</Label>
-                <Input
-                  id="appointment_date"
-                  name="appointment_date"
-                  type="date"
-                  value={formData.appointment_date}
-                  onChange={(e) => setFormData({ ...formData, appointment_date: e.target.value })}
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  className="border-teal-200"
-                />
-              </div>
-              <div>
-                <Label htmlFor="appointment_time">Uhrzeit *</Label>
-                <Input
-                  id="appointment_time"
-                  name="appointment_time"
-                  type="time"
-                  value={formData.appointment_time}
-                  onChange={(e) => setFormData({ ...formData, appointment_time: e.target.value })}
-                  required
-                  className="border-teal-200"
-                />
-              </div>
+            {/* Date */}
+            <div>
+              <Label htmlFor="appointment_date">Datum wählen *</Label>
+              <Input
+                id="appointment_date"
+                name="appointment_date"
+                type="date"
+                value={formData.appointment_date}
+                onChange={(e) => {
+                  setFormData({ ...formData, appointment_date: e.target.value, appointment_time: "" });
+                }}
+                required
+                min={new Date().toISOString().split('T')[0]}
+                className="border-teal-200"
+              />
             </div>
+
+            {/* Available Time Slots */}
+            {formData.appointment_date && (
+              <div>
+                <Label>Verfügbare Uhrzeiten *</Label>
+                {loadingSlots ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">Lade verfügbare Zeiten...</p>
+                  </div>
+                ) : availableSlots.length === 0 ? (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-gray-600">Keine verfügbaren Termine an diesem Tag</p>
+                    <p className="text-sm text-gray-500 mt-2">Bitte wählen Sie ein anderes Datum</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mt-2">
+                    {availableSlots.map((slot) => (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, appointment_time: slot })}
+                        className={`px-4 py-3 rounded-lg border-2 transition-all ${
+                          formData.appointment_time === slot
+                            ? "border-teal-500 bg-teal-500 text-white font-semibold shadow-lg"
+                            : "border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50"
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Notes */}
             <div>
