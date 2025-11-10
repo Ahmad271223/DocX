@@ -150,14 +150,17 @@ def test_doctor_profile_management(doctor_token, doctor_id):
     """Test 2: Doctor Profile Management"""
     print("\n🧪 Testing Doctor Profile Management...")
     
-    # Test Create Doctor Profile
+    # Test Create Doctor Profile with ALL extended fields
     profile_data = {
+        "practice_name": "Praxis Dr. Schmidt & Partner",
+        "practice_address": "Praxisstraße 789",
+        "practice_city": "Berlin",
+        "practice_postal_code": "10117",
+        "practice_phone": "+49 30 12345678",
+        "practice_email": "praxis@schmidt-partner.de",
+        "doctor_names": ["Dr. Maria Schmidt", "Dr. Thomas Weber", "Dr. Sarah Klein"],
         "specialty": "Allgemeinmedizin",
         "license_number": "DE-12345-2025",
-        "address": "Praxisstraße 789",
-        "city": "Berlin",
-        "postal_code": "10117",
-        "phone": "+49 30 12345678",
         "bio": "Erfahrener Allgemeinmediziner mit 15 Jahren Praxis",
         "years_of_experience": 15,
         "languages": ["Deutsch", "Englisch", "Spanisch"]
