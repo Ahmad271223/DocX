@@ -330,6 +330,78 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Routen hinzugefügt: /doctor-register, /doctor-login, /doctor-dashboard mit entsprechenden Guards basierend auf user_type"
+  
+  - task: "Ärzte-Suchseite für Patienten"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DoctorSearchPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Patienten können Ärzte suchen (nach Fachgebiet/Stadt), beim Arzt anmelden/abmelden, abonnierte Ärzte sehen, Termine buchen"
+  
+  - task: "Termin-Buchungs-Seite"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/BookAppointmentPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Patienten können Termine buchen (für sich oder Kinder), Datum/Uhrzeit wählen, Notizen hinzufügen, wiederkehrende Termine erstellen (alle 1-4 Wochen, bis zu 52 Termine)"
+  
+  - task: "Familie-Verbindungs-Seite"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/FamilyConnectionsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Nutzer können eigenen Code teilen, über Code mit anderen verbinden, Beziehung definieren, Verbindungen verwalten, Notfall-Medikamentensuche"
+  
+  - task: "Familie-Medikamenten-Ansicht"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/FamilyMemberMedicationsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Medikamente von verbundenen Familienmitgliedern ansehen (Dosierung, Häufigkeit, Vorrat, Ablaufdatum)"
+  
+  - task: "Familie-Termine-Ansicht"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/FamilyMemberAppointmentsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Termine von verbundenen Familienmitgliedern ansehen (Datum, Zeit, Status, Notizen)"
+  
+  - task: "Dashboard Quick Actions"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DashboardPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Quick Action Buttons hinzugefügt: Arzt suchen & Termin buchen, Familie & Freunde, Medikament hinzufügen"
 
 metadata:
   created_by: "main_agent"
