@@ -159,6 +159,17 @@ class DoctorPatientSubscription(BaseModel):
     status: str = "active"  # active, cancelled
     subscribed_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class FamilyConnection(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # User who initiated the connection
+    connected_user_id: str  # User who is connected
+    connection_code: Optional[str] = None  # Code used to connect
+    status: str = "active"  # active, cancelled
+    nickname: Optional[str] = None  # Optional nickname for the connection
+    relationship: Optional[str] = None  # e.g., "Parent", "Child", "Partner", "Friend"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class Appointment(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
