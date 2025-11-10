@@ -175,7 +175,6 @@ const DoctorAvailabilityManager = ({ token, doctorId, onUpdate }) => {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-1 gap-4">
           <div className="flex gap-2 mt-4">
             <Button type="submit" className="bg-teal-600 hover:bg-teal-700">
               Hinzufügen
