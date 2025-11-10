@@ -139,6 +139,8 @@ class DoctorAvailability(BaseModel):
     day_of_week: int  # 0=Monday, 6=Sunday
     start_time: str  # HH:MM format
     end_time: str  # HH:MM format
+    break_start: Optional[str] = None  # HH:MM format for lunch break start
+    break_end: Optional[str] = None  # HH:MM format for lunch break end
     slot_duration: int = 30  # minutes per appointment slot
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
