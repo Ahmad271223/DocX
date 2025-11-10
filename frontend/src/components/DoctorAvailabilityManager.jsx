@@ -150,6 +150,32 @@ const DoctorAvailabilityManager = ({ token, doctorId, onUpdate }) => {
               />
             </div>
           </div>
+          
+          <div className="border-t border-teal-200 pt-4 mt-4">
+            <Label className="mb-2 block">Mittagspause (optional)</Label>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm">Pause von</Label>
+                <Input
+                  type="time"
+                  value={formData.break_start}
+                  onChange={(e) => setFormData({ ...formData, break_start: e.target.value })}
+                  className="border-teal-300"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Pause bis</Label>
+                <Input
+                  type="time"
+                  value={formData.break_end}
+                  onChange={(e) => setFormData({ ...formData, break_end: e.target.value })}
+                  className="border-teal-300"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-1 gap-4">
           <div className="flex gap-2 mt-4">
             <Button type="submit" className="bg-teal-600 hover:bg-teal-700">
               Hinzufügen
