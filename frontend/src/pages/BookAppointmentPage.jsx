@@ -33,6 +33,12 @@ const BookAppointmentPage = () => {
     fetchChildren();
   }, [doctorId]);
 
+  useEffect(() => {
+    if (formData.appointment_date) {
+      fetchAvailableSlots();
+    }
+  }, [formData.appointment_date]);
+
   const fetchDoctorDetails = async () => {
     try {
       const response = await axios.get(`${API}/doctors/${doctorId}/profile`, {
