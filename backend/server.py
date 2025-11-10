@@ -1292,6 +1292,101 @@ async def get_doctor_availability_by_id(doctor_id: str, current_user: User = Dep
     availability = await db.doctor_availability.find({"doctor_id": doctor_id}, {"_id": 0}).to_list(100)
     return {"availability": availability}
 
+@api_router.get("/doctors/{doctor_id}/available-slots")
+async def get_available_slots(
+    doctor_id: str,
+    date: str,  # YYYY-MM-DD format
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get available time slots for a specific doctor on a specific date
+    Takes into account: availability, breaks, vacations, existing appointments
+    """
+    try:
+        target_date = datetime.fromisoformat(date).date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    # Get day of week (0=Monday, 6=Sunday)
+    day_of_week = target_date.weekday()
+    
+    # Get doctor's availability for this day
+    availability = await db.doctor_availability.find_one({
+        "doctor_id": doctor_id,
+        "day_of_week": day_of_week
+    })
+    
+    if not availability:
+        return {"available_slots": [], "message": "Doctor not available on this day"}
+    
+    # Check if doctor is on vacation
+    vacations = await db.doctor_vacations.find(
+        {"doctor_id": doctor_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    for vacation in vacations:
+        vacation_start = datetime.fromisoformat(vacation["start_date"]).date()
+        vacation_end = datetime.fromisoformat(vacation["end_date"]).date()
+        if vacation_start <= target_date <= vacation_end:
+            return {"available_slots": [], "message": "Doctor is on vacation"}
+    
+    # Generate all possible time slots
+    from datetime import time as dt_time
+    start_hour, start_minute = map(int, availability["start_time"].split(":"))
+    end_hour, end_minute = map(int, availability["end_time"].split(":"))
+    
+    start_datetime = datetime.combine(target_date, dt_time(start_hour, start_minute))
+    end_datetime = datetime.combine(target_date, dt_time(end_hour, end_minute))
+    
+    slot_duration = availability["slot_duration"]
+    
+    # Check for break time
+    break_start_datetime = None
+    break_end_datetime = None
+    if availability.get("break_start") and availability.get("break_end"):
+        break_start_hour, break_start_minute = map(int, availability["break_start"].split(":"))
+        break_end_hour, break_end_minute = map(int, availability["break_end"].split(":"))
+        break_start_datetime = datetime.combine(target_date, dt_time(break_start_hour, break_start_minute))
+        break_end_datetime = datetime.combine(target_date, dt_time(break_end_hour, break_end_minute))
+    
+    # Generate slots
+    slots = []
+    current_slot = start_datetime
+    
+    while current_slot + timedelta(minutes=slot_duration) <= end_datetime:
+        # Skip if slot is during break
+        if break_start_datetime and break_end_datetime:
+            if break_start_datetime <= current_slot < break_end_datetime:
+                current_slot += timedelta(minutes=slot_duration)
+                continue
+        
+        slots.append(current_slot.strftime("%H:%M"))
+        current_slot += timedelta(minutes=slot_duration)
+    
+    # Get existing appointments for this date
+    existing_appointments = await db.appointments.find(
+        {
+            "doctor_id": doctor_id,
+            "appointment_date": date,
+            "status": {"$ne": "cancelled"}
+        },
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Remove booked slots
+    booked_times = [apt["appointment_time"] for apt in existing_appointments]
+    available_slots = [slot for slot in slots if slot not in booked_times]
+    
+    return {
+        "date": date,
+        "day_of_week": day_of_week,
+        "available_slots": available_slots,
+        "slot_duration": slot_duration,
+        "morning_hours": f"{availability['start_time']} - {availability.get('break_start', availability['end_time'])}",
+        "afternoon_hours": f"{availability.get('break_end', '')} - {availability['end_time']}" if availability.get('break_end') else None
+    }
+
 @api_router.delete("/doctors/availability/{availability_id}")
 async def delete_doctor_availability(availability_id: str, current_user: User = Depends(get_current_user)):
     if current_user.user_type != "doctor":
