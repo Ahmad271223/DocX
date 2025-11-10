@@ -347,6 +347,7 @@ class CreateDoctorProfileRequest(BaseModel):
     specialty: str
     license_number: str
     license_document: Optional[str] = None
+    profile_image: Optional[str] = None
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: List[str] = []
