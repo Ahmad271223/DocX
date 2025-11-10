@@ -14,6 +14,11 @@ import LandingPage from "@/pages/LandingPage";
 import DoctorRegisterPage from "@/pages/DoctorRegisterPage";
 import DoctorLoginPage from "@/pages/DoctorLoginPage";
 import DoctorDashboardPage from "@/pages/DoctorDashboardPage";
+import DoctorSearchPage from "@/pages/DoctorSearchPage";
+import BookAppointmentPage from "@/pages/BookAppointmentPage";
+import FamilyConnectionsPage from "@/pages/FamilyConnectionsPage";
+import FamilyMemberMedicationsPage from "@/pages/FamilyMemberMedicationsPage";
+import FamilyMemberAppointmentsPage from "@/pages/FamilyMemberAppointmentsPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
