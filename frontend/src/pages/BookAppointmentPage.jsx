@@ -64,6 +64,25 @@ const BookAppointmentPage = () => {
     }
   };
 
+  const fetchAvailableSlots = async () => {
+    setLoadingSlots(true);
+    try {
+      const response = await axios.get(
+        `${API}/doctors/${doctorId}/available-slots?date=${formData.appointment_date}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAvailableSlots(response.data.available_slots);
+      if (response.data.available_slots.length === 0) {
+        toast.info(response.data.message || "Keine Slots verfügbar an diesem Tag");
+      }
+    } catch (error) {
+      console.error("Failed to fetch slots:", error);
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
