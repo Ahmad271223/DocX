@@ -14,11 +14,13 @@ const BookAppointmentPage = () => {
   const { token, user } = useContext(AuthContext);
   const [doctor, setDoctor] = useState(null);
   const [children, setChildren] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     appointment_date: "",
-    appointment_time: "09:00",
+    appointment_time: "",
     notes: "",
     child_id: "",
     is_recurring: false,
