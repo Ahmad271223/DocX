@@ -1666,6 +1666,32 @@ async def get_doctor_dashboard(current_user: User = Depends(get_current_user)):
 
 # ============== RECURRING APPOINTMENTS ==============
 
+@api_router.delete("/appointments/{appointment_id}")
+async def cancel_appointment(appointment_id: str, current_user: User = Depends(get_current_user)):
+    """
+    Cancel an appointment - sets status to 'cancelled'
+    This will make the time slot available again for others
+    """
+    # Find the appointment
+    appointment = await db.appointments.find_one({
+        "id": appointment_id,
+        "user_id": current_user.id
+    })
+    
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    # Update status to cancelled
+    result = await db.appointments.update_one(
+        {"id": appointment_id, "user_id": current_user.id},
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Appointment not found or already cancelled")
+    
+    return {"message": "Appointment cancelled successfully", "appointment_id": appointment_id}
+
 @api_router.post("/appointments/recurring")
 async def create_recurring_appointment(request: AddAppointmentRequest, current_user: User = Depends(get_current_user)):
     if not request.is_recurring or not request.recurrence_interval_weeks or not request.num_occurrences:
