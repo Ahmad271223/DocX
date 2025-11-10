@@ -2,11 +2,14 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { API, AuthContext } from "@/App";
 import { Card } from "@/components/ui/card";
-import { Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Bell, X, Stethoscope, MapPin } from "lucide-react";
+import { toast } from "sonner";
 
 const UpcomingAppointments = () => {
   const { token } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
+  const [doctorDetails, setDoctorDetails] = useState({});
 
   useEffect(() => {
     fetchUpcomingAppointments();
@@ -20,9 +23,42 @@ const UpcomingAppointments = () => {
       const response = await axios.get(`${API}/appointments/upcoming`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setAppointments(response.data.upcoming_appointments);
+      const apts = response.data.upcoming_appointments;
+      setAppointments(apts);
+      
+      // Fetch doctor details for appointments with doctor_id
+      const doctorIds = [...new Set(apts.filter(apt => apt.doctor_id).map(apt => apt.doctor_id))];
+      const doctorDetailsMap = {};
+      
+      for (const doctorId of doctorIds) {
+        try {
+          const docResponse = await axios.get(`${API}/doctors/${doctorId}/profile`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          doctorDetailsMap[doctorId] = docResponse.data.profile;
+        } catch (error) {
+          console.error(`Failed to fetch doctor ${doctorId}:`, error);
+        }
+      }
+      
+      setDoctorDetails(doctorDetailsMap);
     } catch (error) {
       console.error("Failed to fetch upcoming appointments", error);
+    }
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    if (!confirm("Möchten Sie diesen Termin wirklich absagen?")) return;
+    
+    try {
+      await axios.delete(`${API}/appointments/${appointmentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Termin erfolgreich abgesagt");
+      fetchUpcomingAppointments(); // Refresh list
+    } catch (error) {
+      console.error("Failed to cancel appointment:", error);
+      toast.error("Fehler beim Absagen des Termins");
     }
   };
 
