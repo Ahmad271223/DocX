@@ -1180,6 +1180,7 @@ async def create_doctor_profile(request: CreateDoctorProfileRequest, current_use
         specialty=request.specialty,
         license_number=request.license_number,
         license_document=request.license_document,
+        profile_image=request.profile_image,
         bio=request.bio,
         years_of_experience=request.years_of_experience,
         languages=request.languages,
