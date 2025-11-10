@@ -137,6 +137,31 @@ const DashboardPage = () => {
           <p className="text-gray-600">Verwalten Sie Ihre Gesundheit und die Ihrer Familie</p>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <Button
+            onClick={() => navigate("/doctor-search")}
+            className="h-24 bg-gradient-to-br from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white flex flex-col items-center justify-center gap-2 rounded-2xl shadow-lg"
+          >
+            <Calendar className="w-8 h-8" />
+            <span className="font-semibold">Arzt suchen & Termin buchen</span>
+          </Button>
+          <Button
+            onClick={() => navigate("/family-connections")}
+            className="h-24 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white flex flex-col items-center justify-center gap-2 rounded-2xl shadow-lg"
+          >
+            <Users className="w-8 h-8" />
+            <span className="font-semibold">Familie & Freunde</span>
+          </Button>
+          <Button
+            onClick={() => setShowMedicationModal(true)}
+            className="h-24 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white flex flex-col items-center justify-center gap-2 rounded-2xl shadow-lg"
+          >
+            <Pill className="w-8 h-8" />
+            <span className="font-semibold">Medikament hinzufügen</span>
+          </Button>
+        </div>
+
         <UpcomingAppointments />
 
         <Tabs defaultValue="medications" className="space-y-6">
