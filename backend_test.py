@@ -725,10 +725,13 @@ def test_authorization_family_access():
         
         # Try to access user1's data with user2's token (should fail)
         response = make_request("GET", f"/family/member/{user1_id}/medications", token=token2)
-        if response and response.status_code == 403:
-            results.log_success("Authorization - Cannot access non-connected user's data (403 Forbidden)")
+        if response:
+            if response.status_code == 403:
+                results.log_success("Authorization - Cannot access non-connected user's data (403 Forbidden)")
+            else:
+                results.log_failure("Family authorization", f"Expected 403, got {response.status_code}")
         else:
-            results.log_failure("Family authorization", f"Expected 403, got {response.status_code if response else 'No response'}")
+            results.log_failure("Family authorization", "Request failed - no response received")
     else:
         results.log_failure("Create test users for family authorization", "Failed to create test users")
 
