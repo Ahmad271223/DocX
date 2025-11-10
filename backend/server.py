@@ -375,6 +375,14 @@ class AddDoctorVacationRequest(BaseModel):
     end_date: str
     reason: Optional[str] = None
 
+class ConnectFamilyRequest(BaseModel):
+    connection_code: str
+    nickname: Optional[str] = None
+    relationship: Optional[str] = None
+
+class SearchMedicationRequest(BaseModel):
+    medication_name: str
+
 # ============== HELPER FUNCTIONS ==============
 
 def hash_password(password: str) -> str:
