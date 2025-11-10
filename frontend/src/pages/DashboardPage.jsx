@@ -12,6 +12,7 @@ import AddChildModal from "@/components/AddChildModal";
 import AddVitalSignsModal from "@/components/AddVitalSignsModal";
 import TakeMedicationButton from "@/components/TakeMedicationButton";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
+import AppointmentsCalendar from "@/components/AppointmentsCalendar";
 import YearlyCalendar from "@/components/YearlyCalendar";
 import EmergencyAddresses from "@/components/EmergencyAddresses";
 
