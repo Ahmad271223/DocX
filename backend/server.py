@@ -363,6 +363,7 @@ class UpdateDoctorProfileRequest(BaseModel):
     specialty: Optional[str] = None
     license_number: Optional[str] = None
     license_document: Optional[str] = None
+    profile_image: Optional[str] = None
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: Optional[List[str]] = None
