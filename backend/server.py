@@ -370,6 +370,8 @@ class AddDoctorAvailabilityRequest(BaseModel):
     day_of_week: int
     start_time: str
     end_time: str
+    break_start: Optional[str] = None
+    break_end: Optional[str] = None
     slot_duration: int = 30
 
 class AddDoctorVacationRequest(BaseModel):
