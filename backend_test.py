@@ -757,12 +757,15 @@ def test_authorization_security():
         
         # Try to create doctor profile as patient (should fail)
         profile_data = {
+            "practice_name": "Test Praxis",
+            "practice_address": "Test Straße 123",
+            "practice_city": "Test Stadt",
+            "practice_postal_code": "12345",
+            "practice_phone": "+49 123 456789",
+            "practice_email": "test@praxis.de",
+            "doctor_names": ["Dr. Test"],
             "specialty": "Test",
-            "license_number": "TEST-123",
-            "address": "Test",
-            "city": "Test", 
-            "postal_code": "12345",
-            "phone": "+49 123 456789"
+            "license_number": "TEST-123"
         }
         
         response = make_request("POST", "/doctors/profile", profile_data, token=patient_token)
