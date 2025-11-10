@@ -1266,6 +1266,8 @@ async def add_doctor_availability(request: AddDoctorAvailabilityRequest, current
         day_of_week=request.day_of_week,
         start_time=request.start_time,
         end_time=request.end_time,
+        break_start=request.break_start,
+        break_end=request.break_end,
         slot_duration=request.slot_duration
     )
     
