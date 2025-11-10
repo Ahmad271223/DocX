@@ -75,6 +75,15 @@ function App() {
           <Route path="/doctor-register" element={token && user?.user_type === "doctor" ? <Navigate to="/doctor-dashboard" /> : <DoctorRegisterPage />} />
           <Route path="/doctor-login" element={token && user?.user_type === "doctor" ? <Navigate to="/doctor-dashboard" /> : <DoctorLoginPage />} />
           <Route path="/doctor-dashboard" element={token && user?.user_type === "doctor" ? <DoctorDashboardPage /> : <Navigate to="/doctor-login" />} />
+          
+          {/* Patient Routes */}
+          <Route path="/doctor-search" element={token && user?.user_type !== "doctor" ? <DoctorSearchPage /> : <Navigate to="/login" />} />
+          <Route path="/book-appointment/:doctorId" element={token && user?.user_type !== "doctor" ? <BookAppointmentPage /> : <Navigate to="/login" />} />
+          
+          {/* Family Routes */}
+          <Route path="/family-connections" element={token && user?.user_type !== "doctor" ? <FamilyConnectionsPage /> : <Navigate to="/login" />} />
+          <Route path="/family-member/:memberId/medications" element={token && user?.user_type !== "doctor" ? <FamilyMemberMedicationsPage /> : <Navigate to="/login" />} />
+          <Route path="/family-member/:memberId/appointments" element={token && user?.user_type !== "doctor" ? <FamilyMemberAppointmentsPage /> : <Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
