@@ -218,6 +218,8 @@ const DoctorSearchPage = () => {
 };
 
 const DoctorCard = ({ doctor, subscribed, subscriptionId, onSubscribe, onUnsubscribe, onBookAppointment }) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-teal-100 p-6 hover:shadow-xl transition-shadow">
       <div className="mb-4">
@@ -247,6 +249,13 @@ const DoctorCard = ({ doctor, subscribed, subscriptionId, onSubscribe, onUnsubsc
       )}
 
       <div className="space-y-2">
+        <Button
+          onClick={() => navigate(`/doctor-profile/${doctor.id}`)}
+          variant="outline"
+          className="w-full border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          Profil ansehen
+        </Button>
         {subscribed ? (
           <>
             <Button
