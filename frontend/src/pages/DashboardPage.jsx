@@ -325,6 +325,12 @@ const DashboardPage = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="appointments" data-testid="appointments-content">
+            <Card className="p-6">
+              <AppointmentsCalendar />
+            </Card>
+          </TabsContent>
+
           <TabsContent value="emergency" data-testid="emergency-content">
             <EmergencyAddresses />
           </TabsContent>
