@@ -113,7 +113,7 @@ class DoctorProfile(BaseModel):
     bio: Optional[str] = None
     years_of_experience: Optional[int] = None
     languages: List[str] = []
-    profile_image: Optional[str] = None
+    profile_image: Optional[str] = None  # Base64 encoded or URL
     # Legacy fields for backward compatibility
     name: Optional[str] = None
     address: Optional[str] = None
